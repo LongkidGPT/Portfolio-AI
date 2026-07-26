@@ -32,10 +32,13 @@ test("project cards own semantic artwork, copy, and case-opening markup", async 
   assert.match(card, /project-card__image--hover/);
   assert.match(card, /project-card__panel/);
   assert.match(card, /project-card__arrow/);
+  assert.match(card, /project-card--temporary-art/);
+  assert.match(card, /--temporary-artwork-ratio/);
   assert.match(card, /onOpenCase\(project\.caseId\)/);
+  assert.equal(card.match(/data-track-label=/g)?.length, 1);
 });
 
-test("responsive CSS reveals the poster after video playback and real work on mobile", async () => {
+test("responsive CSS stacks mobile project artwork above its DOM panel", async () => {
   const css = await readFile(
     new URL("../src/styles.css", import.meta.url),
     "utf8",
@@ -44,11 +47,45 @@ test("responsive CSS reveals the poster after video playback and real work on mo
   assert.match(css, /\.hero--settled \.hero__video\s*\{\s*opacity:\s*0/);
   assert.match(
     css,
-    /@media \(max-width: 760px\)[\s\S]*?\.project-card__image--default\s*\{\s*opacity:\s*0/,
+    /\.project-card__panel\s*\{[\s\S]*?min-height:\s*42%/,
   );
   assert.match(
     css,
-    /@media \(max-width: 760px\)[\s\S]*?\.project-card__image--hover\s*\{[\s\S]*?opacity:\s*1/,
+    /\.project-card--wide \.project-card__panel\s*\{[\s\S]*?min-height:\s*33%/,
+  );
+
+  const mobile = css.slice(css.indexOf("@media (max-width: 760px)"));
+  assert.match(
+    mobile,
+    /\.project-card__artwork\s*\{[\s\S]*?grid-area:\s*1\s*\/\s*1/,
+  );
+  assert.match(
+    mobile,
+    /\.project-card__panel[\s\S]*?\{[\s\S]*?grid-area:\s*2\s*\/\s*1/,
+  );
+  assert.match(
+    mobile,
+    /\.project-card--temporary-art \.project-card__artwork\s*\{[\s\S]*?aspect-ratio:\s*var\(--temporary-artwork-ratio\)/,
+  );
+  assert.doesNotMatch(
+    css,
+    /\.project-card[^{]*\{[^}]*bottom:\s*\d+(?:\.\d+)?%/,
+  );
+});
+
+test("touch and coarse pointers show project hover artwork by default", async () => {
+  const css = await readFile(
+    new URL("../src/styles.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    css,
+    /@media \(hover: none\), \(pointer: coarse\)[\s\S]*?\.project-card__image--default\s*\{\s*opacity:\s*0/,
+  );
+  assert.match(
+    css,
+    /@media \(hover: none\), \(pointer: coarse\)[\s\S]*?\.project-card__image--hover\s*\{\s*opacity:\s*1/,
   );
 });
 

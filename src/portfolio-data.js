@@ -34,6 +34,7 @@ export const projects = [
     defaultImage: "/assets/work-brand-default.png",
     hoverImage: "/assets/work-brand-hover.png",
     artworkRatio: "3600 / 1860",
+    temporaryArtworkRatio: "3600 / 1246",
     title: "品牌系统｜视觉语言定义",
     description:
       "负责视觉系统中的光影、影像与场景规则模块，将既有品牌战略转化为跨品牌、跨团队的可执行应用方法，并参与全球市场落地",
@@ -45,6 +46,7 @@ export const projects = [
     defaultImage: "/assets/work-marketing-default.png",
     hoverImage: "/assets/work-marketing-hover.png",
     artworkRatio: "1748 / 1602",
+    temporaryArtworkRatio: "1748 / 929",
     title: "营销全案｜新品上市视觉",
     description: "面向北美市场的DTC落地页设计与数据驱动优化，Pre-Order点击率提升2.6倍",
   },
@@ -55,6 +57,7 @@ export const projects = [
     defaultImage: "/assets/work-system-default.png",
     hoverImage: "/assets/work-system-hover.png",
     artworkRatio: "1748 / 1602",
+    temporaryArtworkRatio: "1748 / 929",
     title: "系统架构｜品牌包装规范",
     description: "构建可复用包装规范体系，品牌视觉识别度提升32%，新SKU接入效率提升40%",
   },

@@ -3,7 +3,9 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 export function ProjectCard({ project, onOpenCase }) {
   return (
     <button
-      className={`project-card ${project.className}`}
+      className={`project-card ${project.className}${
+        project.temporaryArtworkRatio ? " project-card--temporary-art" : ""
+      }`}
       type="button"
       aria-label={`${project.title}，查看项目`}
       data-track-label={project.title}
@@ -11,7 +13,11 @@ export function ProjectCard({ project, onOpenCase }) {
     >
       <span
         className="project-card__artwork"
-        style={{ "--artwork-ratio": project.artworkRatio }}
+        style={{
+          "--artwork-ratio": project.artworkRatio,
+          "--temporary-artwork-ratio":
+            project.temporaryArtworkRatio ?? project.artworkRatio,
+        }}
       >
         <img
           className="project-card__image project-card__image--default"

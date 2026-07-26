@@ -485,6 +485,10 @@ a:focus-visible {
     transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.project-card--temporary-art .project-card__image {
+  object-position: center top;
+}
+
 .project-card__image--hover {
   opacity: 0;
 }
@@ -506,14 +510,14 @@ a:focus-visible {
   grid-template-columns: minmax(0, 1fr) auto;
   align-self: end;
   align-items: center;
-  min-height: 38%;
+  min-height: 42%;
   padding: clamp(24px, 3.2vw, 54px) clamp(24px, 3.4vw, 58px);
   gap: clamp(20px, 3vw, 52px);
   background: rgba(0, 13, 14, 0.97);
 }
 
 .project-card--wide .project-card__panel {
-  min-height: 29%;
+  min-height: 33%;
 }
 
 .project-card__copy {
@@ -1240,6 +1244,14 @@ a:focus-visible {
     grid-column: auto;
   }
 
+  .project-card__artwork {
+    grid-area: 1 / 1;
+  }
+
+  .project-card--temporary-art .project-card__artwork {
+    aspect-ratio: var(--temporary-artwork-ratio);
+  }
+
   .project-card__image--hover {
     opacity: 1;
   }
@@ -1250,6 +1262,8 @@ a:focus-visible {
 
   .project-card__panel,
   .project-card--wide .project-card__panel {
+    grid-area: 2 / 1;
+    align-self: stretch;
     min-height: 0;
     padding: 20px;
     gap: 16px;

@@ -24,15 +24,19 @@ test("each project defines independent default and hover imagery", () => {
 
 test("each project maps to a case and exposes a stable artwork ratio", () => {
   assert.deepEqual(
-    projects.map(({ id, caseId }) => [id, caseId]),
+    projects.map(
+      ({ id, caseId, artworkRatio, temporaryArtworkRatio }) => [
+        id,
+        caseId,
+        artworkRatio,
+        temporaryArtworkRatio,
+      ],
+    ),
     [
-      ["brand", "brand"],
-      ["marketing", "marketing"],
-      ["system", "system"],
+      ["brand", "brand", "3600 / 1860", "3600 / 1246"],
+      ["marketing", "marketing", "1748 / 1602", "1748 / 929"],
+      ["system", "system", "1748 / 1602", "1748 / 929"],
     ],
-  );
-  assert.ok(
-    projects.every((project) => /^\d+ \/ \d+$/.test(project.artworkRatio)),
   );
 });
 
