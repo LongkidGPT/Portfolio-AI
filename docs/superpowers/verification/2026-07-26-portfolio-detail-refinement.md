@@ -2,27 +2,48 @@
 
 ## Result
 
-PASS. The completed page satisfies the approved desktop, tablet, mobile, zoom, interaction, modal, analytics, resource, and console requirements.
+BLOCKED. Desktop, tablet, mobile, interaction, modal, analytics, resource, and
+console requirements passed. The complete real Chrome browser-zoom matrix did
+not: 80%, 100%, and 125% page/card checks completed, but their focused modal
+measurements did not; 150% was interrupted when the user moved Chrome's
+foreground state to another tab. No viewport-equivalent result is counted as
+real browser-zoom evidence.
 
-- Tested URL: `http://127.0.0.1:4174/?owner=1&visitor=task7`
+- Responsive/browser-interaction URL: `http://127.0.0.1:4174/?owner=1&visitor=task7`
+- Real Chrome zoom URL: `http://127.0.0.1:4174/?owner=1&visitor=chrome-real-zoom`
 - Tested commit: `ca442409fa9765723f94f500ab2ac4e185c9dbd3`
-- Browser driver: `npx --yes agent-browser`
+- Browser drivers: `npx --yes agent-browser`; user Chrome through the Chrome
+  extension and Computer Use for browser-level zoom
 - Verification date: 2026-07-26
 
-## Viewport and zoom matrix
+## Responsive viewport matrix
 
 | Mode | Browser CSS viewport | Result | Evidence |
 | --- | ---: | --- | --- |
 | Desktop | 1440 × 1000 | PASS | No horizontal overflow; all three cards and the 860px modal stayed in bounds. |
-| Tablet | 820 × 1180 | PASS | No horizontal overflow; two-column cards remained readable; modal measured 796px. |
+| Tablet | 820 × 1180 | PASS | No horizontal overflow; two-column cards remained readable; modal measured 796px; long-case middle and bottom were inspected. |
 | Mobile | 390 × 844 | PASS | Stacked cards, default hover artwork, 366px modal, continuous long-case scroll. |
-| Small mobile | 320 × 568 | PASS | Stacked cards, default hover artwork, 296px modal, usable collapsed Live Signal bar. |
-| Desktop zoom 80% | 1800 × 1250 effective CSS viewport | PASS | No clipping, copy/arrow overlap, panel overflow, or page overflow; modal 860px. |
-| Desktop zoom 100% | 1440 × 1000 effective CSS viewport | PASS | No clipping, copy/arrow overlap, panel overflow, or page overflow; modal 860px. |
-| Desktop zoom 125% | 1152 × 800 effective CSS viewport | PASS | No clipping, copy/arrow overlap, panel overflow, or page overflow; modal 860px. |
-| Desktop zoom 150% | 960 × 667 effective CSS viewport | PASS | No clipping, copy/arrow overlap, panel overflow, or page overflow; modal 860px. |
+| Small mobile | 320 × 568 | PASS | Stacked cards, default hover artwork, 296px modal, usable collapsed Live Signal bar; long-case middle and bottom were inspected. |
 
-The headless browser exposes the layout viewport in CSS pixels. Zoom reflow was therefore tested with the exact 1440 × 1000 physical-desktop equivalents (`physical pixels ÷ zoom`). All values below came from live computed styles and `getBoundingClientRect()`, not from source-only inspection or CSS transforms.
+The earlier 1800 × 1250, 1440 × 1000, 1152 × 800, and 960 × 667 checks
+remain useful responsive-reflow stress tests only. They are not browser zoom
+and are excluded from the real Chrome matrix below.
+
+## Real Chrome browser zoom matrix
+
+The same Chrome window and local-origin tab were used. Zoom was applied at the
+browser level, not through CSS transforms or viewport replacement.
+
+| Chrome zoom | Live browser metrics | Page/card result | Modal result | Evidence | Status |
+| ---: | --- | --- | --- | --- | --- |
+| 80% | `inner=1715×860`, `devicePixelRatio=1.6`, no document overflow; card widths `944/457/457px`; copy-arrow gap `51px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-80-work.png` | PARTIAL |
+| 100% | `inner=1372×688`, `devicePixelRatio=2`, no document overflow; card widths `856/413/413px`; copy-arrow gap `41px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-100-work.png` | PARTIAL |
+| 125% | `inner=1097×550`, `devicePixelRatio=2.5`, no document overflow; card widths `685/327/327px`; copy-arrow gap `33px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-125-work.png` | PARTIAL |
+| 150% | The user changed Chrome's foreground state to YouTube while the claimed portfolio tab remained in the background. OS-level zoom shortcuts could not be sent safely to the background tab. | Not measured | Not measured | No valid screenshot | BLOCKED |
+
+The stopping condition is tooling/foreground ownership, not a discovered page
+layout failure. Retest 150% and modal containment at all four real zoom levels
+after the portfolio tab can remain foreground-controlled.
 
 ## Approved-requirement results
 
@@ -31,12 +52,13 @@ The headless browser exposes the layout viewport in CSS pixels. Zoom reflow was 
 | Navigation border | PASS | `.top-nav::before` computed to `linear-gradient(90deg, white 0%, transparent 50%, white 100%)`, opacity `0.26`. |
 | Reduced heading/support spacing | PASS | Measured desktop gaps: Hero `25.19px`, Approach `29.39px`, Selected Work `19.59px`, Experience identity/summary `12.59px`, Contact `33.59px`. The automated exact-30%-reduction contract also passed. |
 | Independent project hover artwork | PASS | Each card independently transitioned from default/hover opacity `1/0` to `0/1`; panel and arrow bounding boxes stayed unchanged. |
-| Card text and arrow stability | PASS | At every viewport/zoom, descriptions were not clipped, copy and arrow rectangles did not intersect, arrows stayed inside their panel column, and panels had no horizontal overflow. Computed copy position was `static` with `bottom: auto`. |
+| Card text and arrow stability | PARTIAL | All responsive viewports passed. Real Chrome 80%, 100%, and 125% also had no document overflow or copy/arrow clipping, with minimum measured gaps of `51px`, `41px`, and `33px`; 150% remains blocked. Computed copy position in the responsive runs was `static` with `bottom: auto`. |
 | Project-to-case mapping | PASS | Brand opened `品牌系统｜视觉语言定义` with six `/assets/cases/brand/` slices; Marketing opened `营销全案｜新品上市视觉` with eight `/assets/cases/marketing/` slices; System opened `系统架构｜品牌包装规范` with five `/assets/cases/system/` slices. |
 | Desktop modal width | PASS | Document measured exactly `860px`. |
 | Tablet/mobile modal width | PASS | Measured `796px` at 820, `366px` at 390, and `296px` at 320: viewport width minus `24px` in every case. |
-| Lazy case resources | PASS | At desktop modal top, only brand slices 01–02 were requested; slices 03–04 began after scrolling to 3900px and 05–06 at the bottom. At 390px, the browser preload horizon requested 01–03 initially, 04–05 after scrolling to 2000px, and 06 at the bottom. First-slice resource start preceded later slices in both runs. |
-| Continuous case scrolling | PASS | All five adjacent brand-slice gaps measured `0px` at the top, middle, and bottom; all six images had non-zero natural width by the bottom. No visual seam appeared in representative screenshots. |
+| Real-zoom modal containment | BLOCKED | The real Chrome focused run did not open and measure the modal at 80%, 100%, 125%, or 150%. Responsive/modal measurements are not substituted for this requirement. |
+| Lazy case resources | PASS | At desktop and 820px modal top, only brand slices 01–02 were requested. At 390px and 320px, the shorter slice height put 01–03 inside Chrome's initial lazy-load horizon. At 820px, scrolling to `5200px` requested 03–05 while 06 remained unloaded until the bottom. At 320px, 04–06 were not requested until scrolling to `1800px`. First-slice resource start preceded later batches in every run. |
+| Continuous case scrolling | PASS | All five adjacent brand-slice gaps measured `0px` at the top, middle, and bottom. At 820px, the 03→04 boundary appeared at viewport `y=510.73px` and the modal reached `scrollTop=max=8688px`; at 320px, the same boundary appeared at `y=326.67px` and the modal reached `scrollTop=max=3108px`. All six images had non-zero natural width by each bottom. No seam appeared in the middle/bottom screenshots. |
 | Modal close behavior | PASS | Close button, backdrop pointer click, and Escape each dismissed the dialog. Body overflow locked while open and restored afterward. Page scroll restored to its prior value and focus returned to the invoking project card. Sticky close remained fully visible at the bottom of the long case. |
 | Mobile project behavior | PASS | Document scroll width equaled client width at 390 and 320. Artwork preceded the DOM panel; default/hover opacities computed to `0/1`; titles, descriptions, and arrows did not overlap. |
 | Experience ordering | PASS | At 820, 390, and 320, the intro rectangle preceded the career-list rectangle; mobile career rows were stacked at full list width. |
@@ -52,10 +74,16 @@ The headless browser exposes the layout viewport in CSS pixels. Zoom reflow was 
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/desktop-brand-modal-mid.png`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/desktop-live-signal.png`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/tablet-820-work.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/tablet-820-brand-modal-mid-fix1.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/tablet-820-brand-modal-bottom-fix1.png`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-390-brand-modal-mid.png`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-320-work.png`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-320-brand-modal.png`
-- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/desktop-zoom-150-work.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-320-brand-modal-mid-fix1.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-320-brand-modal-bottom-fix1.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-80-work.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-100-work.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-125-work.png`
 
 ## Automated final gate
 
