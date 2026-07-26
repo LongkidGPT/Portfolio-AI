@@ -92,7 +92,7 @@ after the portfolio tab can remain foreground-controlled.
 
 ## Automated final gate
 
-- `npm test`: PASS, 62 tests, 0 failures.
+- `npm test`: PASS, 63 tests, 0 failures.
 - `npm run build`: PASS, Vite transformed 4,583 modules and prepared the Sites build.
 - `git diff --check 63c1625..HEAD`: PASS after the final documentation cleanup, no output.
 - `git status --short`: clean after the final verification commit.
