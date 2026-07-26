@@ -61,7 +61,7 @@ after the portfolio tab can remain foreground-controlled.
 | Continuous case scrolling | PASS | All five adjacent brand-slice gaps measured `0px` at the top, middle, and bottom. At 820px, the 03→04 boundary appeared at viewport `y=510.73px` and the modal reached `scrollTop=max=8688px`; at 320px, the same boundary appeared at `y=326.67px` and the modal reached `scrollTop=max=3108px`. All six images had non-zero natural width by each bottom. No seam appeared in the middle/bottom screenshots. |
 | Modal close behavior | PASS | Close button, backdrop pointer click, and Escape each dismissed the dialog. Body overflow locked while open and restored afterward. Page scroll restored to its prior value and focus returned to the invoking project card. Sticky close remained fully visible at the bottom of the long case. |
 | Modal focus isolation | PASS | The page background becomes `inert` and `aria-hidden` while the dialog is open; Tab and Shift+Tab wrap inside the dialog; cleanup restores the prior attributes, body overflow, and invoking-card focus. |
-| Case-study accessibility | PASS | The dialog has one programmatic title; continuous visual slices use empty alt text and stay hidden from assistive technology instead of announcing repetitive page numbers. |
+| Case-study accessibility | PASS | The dialog has one programmatic title and a structured hidden summary covering project background, responsibility, and outcome; continuous visual slices use empty alt text and stay hidden from assistive technology instead of announcing repetitive page numbers. Summary content lives outside the generated slice manifest, so rebuilding case assets does not remove it. |
 | Mobile project behavior | PASS | Document scroll width equaled client width at 390 and 320. Artwork preceded the DOM panel; default/hover opacities computed to `0/1`; titles, descriptions, and arrows did not overlap. |
 | Experience ordering | PASS | At 820, 390, and 320, the intro rectangle preceded the career-list rectangle; mobile career rows were stacked at full list width. |
 | VisitorMonitor usability | PASS | The mobile bar stayed fully inside the viewport and could be collapsed to a 44px-high bar before card interaction. At 820, 390, and 320, its rectangle did not intersect the modal close rectangle; the modal also remained above it in stacking order. |
@@ -92,8 +92,8 @@ after the portfolio tab can remain foreground-controlled.
 
 ## Automated final gate
 
-- `npm test`: PASS, 69 tests, 0 failures, including real React DOM modal/card interaction coverage.
-- `npm run build`: PASS, Vite transformed 4,583 modules and prepared the Sites build.
+- `npm test`: PASS, 70 tests, 0 failures, including real React DOM modal/card interaction and manifest-regeneration coverage.
+- `npm run build`: PASS, Vite transformed 4,584 modules and prepared the Sites build.
 - `git diff --check 63c1625..HEAD`: PASS after the final documentation cleanup, no output.
 - `git status --short`: clean after the final verification commit.
 
