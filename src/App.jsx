@@ -2,7 +2,9 @@ import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 import { experience, principles, projects } from "./portfolio-data.js";
+import { copyText } from "./copy-text.js";
 import { resolveHeroMode } from "./hero-controller.js";
+import { VisitorMonitor } from "./VisitorMonitor.jsx";
 
 function SectionLabel({ number, children }) {
   return (
@@ -19,6 +21,7 @@ function ProjectCard({ project }) {
       className={`project-card ${project.className}`}
       href="#contact"
       aria-label={`${project.title}，查看项目`}
+      data-track-label={project.title}
     >
       <img
         className="project-card__image project-card__image--default"
@@ -35,6 +38,61 @@ function ProjectCard({ project }) {
         <span>{project.description}</span>
       </span>
     </a>
+  );
+}
+
+function CopyButton({
+  value,
+  label,
+  copiedLabel,
+  className,
+  trackLabel,
+  showArrow = false,
+}) {
+  const [copyState, setCopyState] = useState("idle");
+  const feedbackTimerRef = useRef(null);
+
+  useEffect(
+    () => () => window.clearTimeout(feedbackTimerRef.current),
+    [],
+  );
+
+  const handleCopy = async () => {
+    const copied = await copyText(value);
+    setCopyState(copied ? "copied" : "failed");
+    window.clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = window.setTimeout(
+      () => setCopyState("idle"),
+      1800,
+    );
+  };
+
+  const visibleLabel =
+    copyState === "copied"
+      ? copiedLabel
+      : copyState === "failed"
+        ? "复制失败，请重试"
+        : label;
+
+  return (
+    <button
+      className={`${className} copy-action copy-action--${copyState}`}
+      type="button"
+      data-track-label={trackLabel}
+      onClick={handleCopy}
+      aria-live="polite"
+    >
+      {visibleLabel}
+      {copyState === "copied" ? (
+        <span className="copy-action__status" aria-hidden="true">
+          ✓
+        </span>
+      ) : (
+        showArrow && (
+          <ArrowUpRight aria-hidden="true" size={14} weight="regular" />
+        )
+      )}
+    </button>
   );
 }
 
@@ -93,6 +151,8 @@ export function App() {
       <section
         className={`hero hero--${heroState}`}
         id="hero"
+        data-track-section
+        data-track-label="HERO"
         onPointerEnter={handleHeroPointerEnter}
       >
         <video
@@ -133,13 +193,24 @@ export function App() {
               View selected work
               <ArrowDown aria-hidden="true" size={14} weight="regular" />
             </a>
-            <span className="wechat-pill">Wechat: LKchat1980</span>
+            <CopyButton
+              className="wechat-pill"
+              value="LKchat1980"
+              label="Wechat: LKchat1980"
+              copiedLabel="已复制微信号"
+              trackLabel="Wechat: LKchat1980"
+            />
           </div>
         </div>
       </section>
 
       <main className="content-layer">
-        <section className="section approach" id="approach">
+        <section
+          className="section approach"
+          id="approach"
+          data-track-section
+          data-track-label="APPROACH"
+        >
           <div className="shell">
             <SectionLabel number="01">APPROACH</SectionLabel>
             <div className="approach__layout">
@@ -167,7 +238,12 @@ export function App() {
           </div>
         </section>
 
-        <section className="section work" id="work">
+        <section
+          className="section work"
+          id="work"
+          data-track-section
+          data-track-label="SELECTED WORK"
+        >
           <div className="shell">
             <SectionLabel number="02">SELECTED WORK</SectionLabel>
             <header className="section-heading">
@@ -182,7 +258,12 @@ export function App() {
           </div>
         </section>
 
-        <section className="section experience" id="experience">
+        <section
+          className="section experience"
+          id="experience"
+          data-track-section
+          data-track-label="EXPERIENCE"
+        >
           <div className="shell">
             <SectionLabel number="03">EXPERIENCE</SectionLabel>
             <div className="experience__layout">
@@ -209,7 +290,12 @@ export function App() {
           </div>
         </section>
 
-        <section className="contact" id="contact">
+        <section
+          className="contact"
+          id="contact"
+          data-track-section
+          data-track-label="LET’S TALK"
+        >
           <div className="contact__content">
             <h2>LET&apos;S TALK</h2>
             <p className="contact__details">
@@ -221,13 +307,14 @@ export function App() {
               <span aria-hidden="true">|</span>
               <a href="tel:+8618520224719">Mobile：18520224719</a>
             </p>
-            <a
+            <CopyButton
               className="button button--light contact__button"
-              href="mailto:long.kidq@gmail.com"
-            >
-              start a conversation
-              <ArrowUpRight aria-hidden="true" size={14} weight="regular" />
-            </a>
+              value="long.kidq@gmail.com"
+              label="start a conversation"
+              copiedLabel="已复制邮箱"
+              trackLabel="start a conversation"
+              showArrow
+            />
           </div>
           <footer className="footer">
             <span>© 2026 Kid Long · 龙昊翔</span>
@@ -235,6 +322,7 @@ export function App() {
           </footer>
         </section>
       </main>
+      <VisitorMonitor />
     </>
   );
 }
