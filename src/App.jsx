@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 import { experience, principles, projects } from "./portfolio-data.js";
+import { CaseStudyModal } from "./CaseStudyModal.jsx";
 import { copyText } from "./copy-text.js";
 import { resolveHeroMode } from "./hero-controller.js";
 import { VisitorMonitor } from "./VisitorMonitor.jsx";
@@ -15,13 +16,17 @@ function SectionLabel({ number, children }) {
   );
 }
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, onOpenCase }) {
   return (
     <a
       className={`project-card ${project.className}`}
       href="#contact"
       aria-label={`${project.title}，查看项目`}
       data-track-label={project.title}
+      onClick={(event) => {
+        event.preventDefault();
+        onOpenCase(project.id);
+      }}
     >
       <img
         className="project-card__image project-card__image--default"
@@ -99,7 +104,11 @@ function CopyButton({
 export function App() {
   const videoRef = useRef(null);
   const [heroState, setHeroState] = useState("loading");
+  const [selectedCaseId, setSelectedCaseId] = useState(null);
   const replayedRef = useRef(false);
+  const selectedProject = projects.find(
+    (project) => project.id === selectedCaseId,
+  );
 
   useEffect(() => {
     const video = videoRef.current;
@@ -252,7 +261,11 @@ export function App() {
             </header>
             <div className="project-grid">
               {projects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onOpenCase={setSelectedCaseId}
+                />
               ))}
             </div>
           </div>
@@ -323,6 +336,11 @@ export function App() {
         </section>
       </main>
       <VisitorMonitor />
+      <CaseStudyModal
+        caseId={selectedCaseId}
+        title={selectedProject?.title ?? ""}
+        onClose={() => setSelectedCaseId(null)}
+      />
     </>
   );
 }

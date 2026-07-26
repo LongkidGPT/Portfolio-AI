@@ -245,6 +245,83 @@ a:focus-visible {
   line-height: 1;
 }
 
+.case-study {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  overflow-y: auto;
+  padding: 24px 12px;
+  background: rgba(0, 0, 0, 0.84);
+}
+
+.case-study__document {
+  width: 860px;
+  max-width: calc(100vw - 24px);
+  min-height: 100%;
+  margin: 0 auto;
+  background: #111;
+}
+
+.case-study__close {
+  position: sticky;
+  z-index: 1;
+  top: 12px;
+  display: block;
+  margin: 12px 12px -44px auto;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  cursor: pointer;
+  font: 12px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.case-study__loading,
+.case-study__retry {
+  display: grid;
+  place-items: center;
+  min-height: 64px;
+  color: rgba(245, 248, 248, 0.72);
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.case-study__loading {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 132px;
+  min-height: 36px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.case-study__slice {
+  position: relative;
+  overflow: hidden;
+  background: #111;
+}
+
+.case-study__slice img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  margin: 0;
+  border-radius: 0;
+}
+
+.case-study__retry {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+
 .content-layer {
   position: relative;
   z-index: 2;
@@ -1019,6 +1096,14 @@ a:focus-visible {
 @media (max-width: 760px) {
   :root {
     --shell: calc(100vw - 40px);
+  }
+
+  .case-study {
+    padding: 12px;
+  }
+
+  .case-study__document {
+    width: calc(100vw - 24px);
   }
 
   .top-nav {

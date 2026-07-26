@@ -42,3 +42,22 @@ test("responsive CSS reveals the poster after video playback and real work on mo
     /@media \(max-width: 760px\)[\s\S]*?\.project-card__image--hover\s*\{[\s\S]*?opacity:\s*1/,
   );
 });
+
+test("case-study modal renders the required accessible document shell", async () => {
+  const [app, modal, css] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/CaseStudyModal.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(app, /selectedCaseId/);
+  assert.match(app, /<CaseStudyModal/);
+  assert.match(modal, /loading="lazy"/);
+  assert.match(modal, /aria-modal="true"/);
+  assert.match(modal, /case-study__retry/);
+  assert.match(css, /\.case-study__document\s*\{[\s\S]*?width:\s*860px/);
+  assert.match(
+    css,
+    /@media \(max-width: 760px\)[\s\S]*?\.case-study__document\s*\{[\s\S]*?width:\s*calc\(100vw - 24px\)/,
+  );
+});
