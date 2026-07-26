@@ -35,7 +35,7 @@ test("blurred public mode keeps live content mounted behind a mask", () => {
 
   assert.equal(model.masked, true);
   assert.equal(model.maskLabel, "DATA MASKED");
-  assert.equal(model.current.visitorLabel, "VISITOR 01");
+  assert.equal(model.current.visitorLabel, "VISITOR");
   assert.equal(model.modeAction, null);
 });
 
@@ -52,12 +52,28 @@ test("open mode exposes anonymized data while controls remain owner-only", () =>
   });
 
   assert.equal(publicModel.masked, false);
-  assert.equal(publicModel.current.visitorLabel, "VISITOR 01");
+  assert.equal(publicModel.current.visitorLabel, "VISITOR");
   assert.equal(publicModel.modeAction, null);
   assert.deepEqual(ownerModel.modeAction, {
     label: "HIDE DATA",
     nextMode: "blurred",
   });
+});
+
+test("all stored visitor numbers are normalized to the public VISITOR label", () => {
+  const model = buildVisitorMonitorModel({
+    mode: "open",
+    snapshot: {
+      ...snapshot,
+      sessions: [
+        { ...snapshot.sessions[0], visitorLabel: "VISITOR 27" },
+      ],
+    },
+    isOwner: false,
+  });
+
+  assert.equal(model.current.visitorLabel, "VISITOR");
+  assert.equal(model.current.visitNumber, 2);
 });
 
 test("selecting a history row switches the visible session and heatmap", () => {

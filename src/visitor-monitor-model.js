@@ -26,7 +26,10 @@ export function buildVisitorMonitorModel({
   return {
     masked: mode === "blurred",
     maskLabel: mode === "blurred" ? "DATA MASKED" : null,
-    current,
+    current:
+      current.id === "empty"
+        ? current
+        : { ...current, visitorLabel: "VISITOR" },
     modeAction: isOwner
       ? mode === "open"
         ? { label: "HIDE DATA", nextMode: "blurred" }
