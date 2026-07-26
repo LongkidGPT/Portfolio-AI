@@ -19,11 +19,20 @@ test("hero uses the supplied video and poster assets", async () => {
   assert.match(app, /playsInline/);
 });
 
-test("project cards render independent image layers", async () => {
-  const app = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+test("project cards own semantic artwork, copy, and case-opening markup", async () => {
+  const card = await readFile(
+    new URL("../src/ProjectCard.jsx", import.meta.url),
+    "utf8",
+  );
 
-  assert.match(app, /project-card__image--default/);
-  assert.match(app, /project-card__image--hover/);
+  assert.doesNotMatch(card, /href="#contact"/);
+  assert.match(card, /type="button"/);
+  assert.match(card, /project-card__artwork/);
+  assert.match(card, /project-card__image--default/);
+  assert.match(card, /project-card__image--hover/);
+  assert.match(card, /project-card__panel/);
+  assert.match(card, /project-card__arrow/);
+  assert.match(card, /onOpenCase\(project\.caseId\)/);
 });
 
 test("responsive CSS reveals the poster after video playback and real work on mobile", async () => {

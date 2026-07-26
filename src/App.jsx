@@ -5,6 +5,7 @@ import { experience, principles, projects } from "./portfolio-data.js";
 import { CaseStudyModal } from "./CaseStudyModal.jsx";
 import { copyText } from "./copy-text.js";
 import { resolveHeroMode } from "./hero-controller.js";
+import { ProjectCard } from "./ProjectCard.jsx";
 import { VisitorMonitor } from "./VisitorMonitor.jsx";
 
 function SectionLabel({ number, children }) {
@@ -13,36 +14,6 @@ function SectionLabel({ number, children }) {
       <span>{number}</span>
       {children}
     </p>
-  );
-}
-
-function ProjectCard({ project, onOpenCase }) {
-  return (
-    <a
-      className={`project-card ${project.className}`}
-      href="#contact"
-      aria-label={`${project.title}，查看项目`}
-      data-track-label={project.title}
-      onClick={(event) => {
-        event.preventDefault();
-        onOpenCase(project.id);
-      }}
-    >
-      <img
-        className="project-card__image project-card__image--default"
-        src={project.defaultImage}
-        alt=""
-      />
-      <img
-        className="project-card__image project-card__image--hover"
-        src={project.hoverImage}
-        alt=""
-      />
-      <span className="project-card__copy">
-        <strong>{project.title}</strong>
-        <span>{project.description}</span>
-      </span>
-    </a>
   );
 }
 
