@@ -53,6 +53,10 @@ test("responsive CSS stacks mobile project artwork above its DOM panel", async (
     css,
     /\.project-card--wide \.project-card__panel\s*\{[\s\S]*?min-height:\s*33%/,
   );
+  assert.match(
+    css,
+    /\.project-card--temporary-art \.project-card__image\s*\{\s*object-position:\s*center top;\s*\}/,
+  );
 
   const mobile = css.slice(css.indexOf("@media (max-width: 760px)"));
   assert.match(
