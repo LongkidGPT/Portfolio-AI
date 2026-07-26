@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 import * as portfolioData from "../src/portfolio-data.js";
@@ -125,4 +125,14 @@ test("hero motion asset stays within a 4 MiB delivery budget", async () => {
     size <= 4 * 1024 * 1024,
     `hero video is ${(size / 1024 / 1024).toFixed(2)} MiB`,
   );
+});
+
+test("document declares an existing favicon instead of requesting missing favicon.ico", async () => {
+  const html = await readFile(repoFile("/index.html"), "utf8");
+  const faviconPath = html.match(
+    /<link\s+rel="icon"[^>]+href="([^"]+)"/,
+  )?.[1];
+
+  assert.ok(faviconPath, "index.html must declare a favicon");
+  await stat(repoFile(`/public${faviconPath}`));
 });
