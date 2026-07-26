@@ -19,11 +19,33 @@ function baseCss(css) {
 }
 
 test("page shell contains all five navigation destinations", async () => {
-  const app = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const [app, experienceSection] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/ExperienceSection.jsx", import.meta.url), "utf8"),
+  ]);
+  const pageShell = `${app}\n${experienceSection}`;
 
   for (const id of ["hero", "approach", "work", "experience", "contact"]) {
-    assert.match(app, new RegExp(`id="${id}"`));
+    assert.match(pageShell, new RegExp(`id="${id}"`));
   }
+});
+
+test("Experience section exposes the editorial career structure", async () => {
+  const [experienceSection, css] = await Promise.all([
+    readFile(new URL("../src/ExperienceSection.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(experienceSection, /className="experience__intro"/);
+  assert.match(experienceSection, /className="experience-list"/);
+  assert.match(experienceSection, /className="experience-row"/);
+  assert.match(experienceSection, /ACROSS BRAND,/);
+  assert.match(experienceSection, /PRODUCT AND MARKET/);
+  assert.match(experienceSection, /data-track-label="EXPERIENCE"/);
+  assert.doesNotMatch(
+    css,
+    /\.experience\s*\{[\s\S]*?min-height:\s*1100px/,
+  );
 });
 
 test("hero uses the supplied video and poster assets", async () => {

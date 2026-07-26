@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { experience, principles, projects } from "./portfolio-data.js";
 import { CaseStudyModal } from "./CaseStudyModal.jsx";
 import { copyText } from "./copy-text.js";
+import { ExperienceSection } from "./ExperienceSection.jsx";
 import { resolveHeroMode } from "./hero-controller.js";
 import { ProjectCard } from "./ProjectCard.jsx";
 import { VisitorMonitor } from "./VisitorMonitor.jsx";
@@ -242,37 +243,7 @@ export function App() {
           </div>
         </section>
 
-        <section
-          className="section experience"
-          id="experience"
-          data-track-section
-          data-track-label="EXPERIENCE"
-        >
-          <div className="shell">
-            <SectionLabel number="03">EXPERIENCE</SectionLabel>
-            <div className="experience__layout">
-              <header className="experience__intro">
-                <h2>
-                  ACROSS BRAND,
-                  <br />
-                  PRODUCT AND MARKET
-                </h2>
-                <h3>Kid（龙昊翔） · 人类 · 资深视觉设计师</h3>
-                <p>10+ 年消费科技、品牌视觉、上市传播与多触点设计经验。</p>
-              </header>
-
-              <div className="experience-list">
-                {experience.map((item) => (
-                  <div className="experience-row" key={item.company}>
-                    <span>{item.company}</span>
-                    <span>{item.role}</span>
-                    <time>{item.period}</time>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <ExperienceSection items={experience} />
 
         <section
           className="contact"
