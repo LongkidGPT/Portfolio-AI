@@ -3,10 +3,19 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 function cssDeclarations(css, selector) {
-  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return [...css.matchAll(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`, "g"))]
-    .map((match) => match[1])
+  return [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter((match) =>
+      match[1]
+        .split(",")
+        .map((entry) => entry.trim())
+        .includes(selector),
+    )
+    .map((match) => match[2])
     .join("\n");
+}
+
+function baseCss(css) {
+  return css.slice(0, css.indexOf("@media "));
 }
 
 test("page shell contains all five navigation destinations", async () => {
@@ -105,21 +114,31 @@ test("navigation uses one-pixel masked gradient borders", async () => {
     new URL("../src/styles.css", import.meta.url),
     "utf8",
   );
+  const desktop = baseCss(css);
 
-  const navRule = cssDeclarations(css, ".top-nav");
-  const talkRule = cssDeclarations(css, ".top-nav__talk");
-  const navBorderRule = cssDeclarations(css, ".top-nav::before");
-  const talkBorderRule = cssDeclarations(css, ".top-nav__talk::before");
+  const navRule = cssDeclarations(desktop, ".top-nav");
+  const talkRule = cssDeclarations(desktop, ".top-nav__talk");
+  const navBorderRule = cssDeclarations(desktop, ".top-nav::before");
+  const talkBorderRule = cssDeclarations(desktop, ".top-nav__talk::before");
+  const gradientPattern =
+    /linear-gradient\(90deg,[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*0\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)/;
+  const navOpacity = Number(navBorderRule.match(/opacity:\s*([\d.]+)/)?.[1]);
+  const talkOpacity = Number(talkBorderRule.match(/opacity:\s*([\d.]+)/)?.[1]);
 
   assert.doesNotMatch(navRule, /\bborder:/);
   assert.doesNotMatch(talkRule, /\bborder:/);
-  assert.match(
-    navBorderRule,
-    /padding:\s*1px;[\s\S]*?linear-gradient\(90deg,[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*0\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)/,
-  );
-  assert.match(talkBorderRule, /padding:\s*1px;[\s\S]*?opacity:\s*0\.\d+/);
+  assert.match(navBorderRule, /padding:\s*1px/);
+  assert.match(talkBorderRule, /padding:\s*1px/);
+  assert.match(navBorderRule, gradientPattern);
+  assert.match(talkBorderRule, gradientPattern);
   assert.match(navBorderRule, /mask-composite:\s*exclude/);
   assert.match(talkBorderRule, /mask-composite:\s*exclude/);
+  assert.ok(
+    Number.isFinite(navOpacity) &&
+      Number.isFinite(talkOpacity) &&
+      talkOpacity < navOpacity,
+    "inner talk border opacity must be lower than the outer navigation border",
+  );
 });
 
 test("heading support spacing is reduced by exactly thirty percent", async () => {
@@ -127,40 +146,41 @@ test("heading support spacing is reduced by exactly thirty percent", async () =>
     new URL("../src/styles.css", import.meta.url),
     "utf8",
   );
+  const desktop = baseCss(css);
 
-  const rootRule = cssDeclarations(css, ":root");
+  const rootRule = cssDeclarations(desktop, ":root");
   assert.match(rootRule, /--heading-support-gap:\s*25\.2px/);
   assert.match(rootRule, /--heading-support-gap-compact:\s*19\.6px/);
   assert.match(
-    cssDeclarations(css, ".hero__content > p"),
+    cssDeclarations(desktop, ".hero__content > p"),
     /margin:\s*var\(--heading-support-gap\)\s+0\s+0/,
   );
   assert.match(
-    cssDeclarations(css, ".approach__intro"),
+    cssDeclarations(desktop, ".approach__intro"),
     /--heading-support-gap:\s*29\.4px/,
   );
   assert.match(
-    cssDeclarations(css, ".approach__intro p"),
+    cssDeclarations(desktop, ".approach__intro p"),
     /margin:\s*var\(--heading-support-gap\)\s+0\s+0/,
   );
   assert.match(
-    cssDeclarations(css, ".section-heading p"),
+    cssDeclarations(desktop, ".section-heading p"),
     /margin-top:\s*var\(--heading-support-gap-compact\)/,
   );
   assert.match(
-    cssDeclarations(css, ".experience__intro"),
+    cssDeclarations(desktop, ".experience__intro"),
     /--heading-support-gap-compact:\s*12\.6px/,
   );
   assert.match(
-    cssDeclarations(css, ".experience__intro p"),
+    cssDeclarations(desktop, ".experience__intro p"),
     /margin-top:\s*var\(--heading-support-gap-compact\)/,
   );
   assert.match(
-    cssDeclarations(css, ".contact"),
+    cssDeclarations(desktop, ".contact"),
     /--heading-support-gap:\s*33\.6px/,
   );
   assert.match(
-    cssDeclarations(css, ".contact__details"),
+    cssDeclarations(desktop, ".contact__details"),
     /margin:\s*var\(--heading-support-gap\)\s+0\s+0/,
   );
 
@@ -176,22 +196,73 @@ test("zoom-stable CSS keeps tablet card copy and modal content in bounds", async
     new URL("../src/styles.css", import.meta.url),
     "utf8",
   );
+  const desktop = baseCss(css);
 
-  assert.match(cssDeclarations(css, "body"), /overflow-x:\s*hidden/);
-  assert.match(cssDeclarations(css, ".content-layer"), /overflow-x:\s*hidden/);
-  assert.match(cssDeclarations(css, "img"), /max-width:\s*100%/);
-  assert.match(cssDeclarations(css, ".case-study__document"), /max-width:\s*100%/);
-  assert.match(cssDeclarations(css, ".project-card__copy > span"), /overflow-wrap:\s*break-word/);
-  assert.doesNotMatch(cssDeclarations(css, ".project-card__copy"), /bottom:\s*\d+%/);
+  assert.match(cssDeclarations(desktop, "body"), /overflow-x:\s*hidden/);
+  assert.match(cssDeclarations(desktop, ".content-layer"), /overflow-x:\s*hidden/);
+  assert.match(cssDeclarations(desktop, "img"), /max-width:\s*100%/);
+  assert.match(cssDeclarations(desktop, ".case-study__document"), /max-width:\s*100%/);
+  assert.doesNotMatch(cssDeclarations(desktop, ".project-card__copy"), /bottom:\s*\d+%/);
+
+  for (const selector of [
+    ".top-nav__brand",
+    ".top-nav__links",
+    ".top-nav__talk",
+    ".approach__intro",
+    ".principles",
+    ".principles__number",
+    ".principles__copy",
+    ".project-card__panel",
+    ".project-card__copy",
+    ".experience__intro",
+    ".experience-list",
+    ".experience-row > *",
+    ".contact__content",
+  ]) {
+    assert.match(
+      cssDeclarations(desktop, selector),
+      /min-width:\s*0/,
+      `${selector} must be allowed to shrink inside its grid`,
+    );
+  }
+
+  for (const selector of [
+    ".hero__content > p",
+    ".approach__intro p",
+    ".section-heading p",
+    ".principles__copy span",
+    ".project-card__copy > span",
+    ".experience__intro p",
+    ".experience-row span",
+    ".contact__details",
+  ]) {
+    assert.match(
+      cssDeclarations(desktop, selector),
+      /overflow-wrap:\s*break-word/,
+      `${selector} must wrap long Chinese or English descriptions`,
+    );
+  }
 
   const tabletStart = css.indexOf(
     "@media (min-width: 761px) and (max-width: 1023px)",
   );
   const tabletEnd = css.indexOf("@media (max-width: 760px)");
   const tablet = css.slice(tabletStart, tabletEnd);
+  const desktopGridWidth = cssDeclarations(desktop, ".project-grid").match(
+    /width:\s*([\d.]+%)/,
+  )?.[1];
+  const tabletGridWidth = cssDeclarations(tablet, ".project-grid").match(
+    /width:\s*([\d.]+%)/,
+  )?.[1];
   assert.match(
     cssDeclarations(tablet, ".project-grid"),
     /grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/,
+  );
+  assert.equal(desktopGridWidth, "80%");
+  assert.equal(
+    tabletGridWidth,
+    desktopGridWidth,
+    "project grid width must not reverse-contract when crossing 1023px to 1024px",
   );
   assert.match(cssDeclarations(tablet, ".project-card__panel"), /padding:\s*clamp\(/);
   assert.match(cssDeclarations(tablet, ".project-card__arrow"), /width:\s*clamp\(/);

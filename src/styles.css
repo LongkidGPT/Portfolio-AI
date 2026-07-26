@@ -1221,7 +1221,7 @@ a:focus-visible {
 @media (min-width: 761px) and (max-width: 1023px) {
   .project-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%;
+    width: 80%;
     gap: clamp(16px, 2.3vw, 24px);
   }
 
