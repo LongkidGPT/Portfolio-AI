@@ -67,7 +67,7 @@ after the portfolio tab can remain foreground-controlled.
 | VisitorMonitor usability | PASS | The mobile bar stayed fully inside the viewport and could be collapsed to a 44px-high bar before card interaction. At 820, 390, and 320, its rectangle did not intersect the modal close rectangle; the modal also remained above it in stacking order. |
 | Live Signal aggregation | PASS | Three real opens of the Brand card rendered `品牌系统｜视觉语言定义 ×3`; each open contributed exactly one title-labelled click. Current and history rows render `VISITOR` while preserving their internal session identities. |
 | Copy feedback | PASS | Real clicks produced `已复制微信号` and `已复制邮箱` before the 1.8-second feedback reset. |
-| Media delivery | PASS | Homepage artwork, poster, and contact imagery use optimized WebP assets; Hero uses the optimized MP4 with `preload="metadata"`. Relevant delivery weight fell from 29.64 MiB to 3.77 MiB while original source assets remain available. Browser verification confirmed desktop hover-on-demand; the coarse-pointer single-image policy is covered by the artwork-policy regression test because the attempted 390 browser preset remained fine-pointer. |
+| Media delivery | PASS | Homepage artwork, poster, and contact imagery use optimized WebP assets; Hero uses the optimized MP4 with `preload="metadata"`. Relevant delivery weight fell from 29.64 MiB to 3.77 MiB while original source assets remain available under `source-assets/homepage`. Moving those originals outside `public` reduced `dist/client` from 45,544 KiB to 9,132 KiB. Browser verification confirmed desktop hover-on-demand; the coarse-pointer single-image policy is covered by the artwork-policy regression test because the attempted 390 browser preset remained fine-pointer. |
 | Resources | PASS | All observed case WebP requests returned HTTP 200. No case-study PNG was requested by the browser. |
 | Console/page errors | PASS | Focused desktop verification returned no page or console errors. A discovered implicit `favicon.ico` 404 was fixed by declaring the existing WebP poster as the favicon; its local resource returns HTTP 200 and the regression test prevents an undeclared favicon. |
 
@@ -92,7 +92,7 @@ after the portfolio tab can remain foreground-controlled.
 
 ## Automated final gate
 
-- `npm test`: PASS, 63 tests, 0 failures.
+- `npm test`: PASS, 69 tests, 0 failures, including real React DOM modal/card interaction coverage.
 - `npm run build`: PASS, Vite transformed 4,583 modules and prepared the Sites build.
 - `git diff --check 63c1625..HEAD`: PASS after the final documentation cleanup, no output.
 - `git status --short`: clean after the final verification commit.
