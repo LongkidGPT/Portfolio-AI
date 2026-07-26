@@ -1,10 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 
 import { caseStudies } from "./case-study-manifest.js";
-import { getCaseStudy, shouldDismissCaseStudy } from "./case-study-model.js";
+import {
+  activateModalEnvironment,
+  getCaseStudy,
+  getCaseStudyAccessibility,
+  getRetrySliceSource,
+  handleCaseStudyBackdrop,
+  handleCaseStudyKeyDown,
+  nextSliceRetryState,
+} from "./case-study-model.js";
 
-export function CaseStudyModal({ caseId, title, onClose }) {
+export function CaseStudyModal({
+  caseId,
+  title,
+  onClose,
+  backgroundRef,
+  returnFocusRef,
+}) {
   const caseStudy = getCaseStudy(caseStudies, caseId);
+  const accessibility = getCaseStudyAccessibility(title);
+  const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
   const [sliceStates, setSliceStates] = useState({});
 
@@ -15,58 +31,62 @@ export function CaseStudyModal({ caseId, title, onClose }) {
   useEffect(() => {
     if (!caseStudy) return undefined;
 
-    const activeElement = document.activeElement;
-    const originalOverflow = document.body.style.overflow;
     const handleKeyDown = (event) => {
-      if (shouldDismissCaseStudy({ type: event.type, key: event.key })) {
-        onClose();
-      }
+      handleCaseStudyKeyDown({
+        event,
+        modalElement: modalRef.current,
+        onClose,
+      });
     };
+    const restoreEnvironment = activateModalEnvironment({
+      backgroundElement: backgroundRef?.current,
+      body: document.body,
+      returnFocusElement: returnFocusRef?.current ?? document.activeElement,
+    });
 
-    document.body.style.overflow = "hidden";
     document.addEventListener("keydown", handleKeyDown);
     closeButtonRef.current?.focus();
 
     return () => {
-      document.body.style.overflow = originalOverflow;
       document.removeEventListener("keydown", handleKeyDown);
-      activeElement?.focus?.();
+      restoreEnvironment();
     };
-  }, [caseStudy, onClose]);
+  }, [backgroundRef, caseStudy, onClose, returnFocusRef]);
 
   if (!caseStudy) return null;
 
   const handleBackdropClick = (event) => {
-    const isBackdrop = event.target === event.currentTarget;
-    if (shouldDismissCaseStudy({ type: "backdrop", isBackdrop })) {
-      onClose();
-    }
+    handleCaseStudyBackdrop({ event, onClose });
   };
 
   const retrySlice = (index) => {
     setSliceStates((currentStates) => ({
       ...currentStates,
-      [index]: {
-        error: false,
-        retry: (currentStates[index]?.retry ?? 0) + 1,
-      },
+      [index]: nextSliceRetryState(currentStates[index]),
     }));
   };
 
   return (
     <div
+      ref={modalRef}
       className="case-study"
       role="dialog"
       aria-modal="true"
-      aria-label={title || "项目案例"}
+      aria-labelledby={accessibility.titleId}
       onClick={handleBackdropClick}
     >
       <div className="case-study__document">
+        <h2
+          className="case-study__heading"
+          id={accessibility.titleId}
+        >
+          {accessibility.title}
+        </h2>
         <button
           ref={closeButtonRef}
           className="case-study__close"
           type="button"
-          onClick={() => onClose()}
+          onClick={onClose}
           aria-label="关闭案例"
         >
           关闭 ×
@@ -78,12 +98,10 @@ export function CaseStudyModal({ caseId, title, onClose }) {
         )}
         {caseStudy.slices.map((slice, index) => {
           const sliceState = sliceStates[index] ?? {};
-          const source = sliceState.retry
-            ? `${slice.src}?retry=${sliceState.retry}`
-            : slice.src;
+          const source = getRetrySliceSource(slice.src, sliceState.retry);
           const imageProps = {
             src: source,
-            alt: `${title}，第 ${index + 1} 张`,
+            ...accessibility.imageAttributes,
             onLoad: () =>
               setSliceStates((currentStates) => ({
                 ...currentStates,
