@@ -60,13 +60,21 @@ test("open mode exposes anonymized data while controls remain owner-only", () =>
   });
 });
 
-test("all stored visitor numbers are normalized to the public VISITOR label", () => {
+test("current and history visitor labels are normalized without changing session identity", () => {
+  const olderSession = {
+    ...snapshot.sessions[0],
+    id: "session-01",
+    visitorLabel: "VISITOR 03",
+    visitNumber: 1,
+    active: false,
+  };
   const model = buildVisitorMonitorModel({
     mode: "open",
     snapshot: {
       ...snapshot,
       sessions: [
         { ...snapshot.sessions[0], visitorLabel: "VISITOR 27" },
+        olderSession,
       ],
     },
     isOwner: false,
@@ -74,6 +82,17 @@ test("all stored visitor numbers are normalized to the public VISITOR label", ()
 
   assert.equal(model.current.visitorLabel, "VISITOR");
   assert.equal(model.current.visitNumber, 2);
+  assert.deepEqual(
+    model.sessions.map(({ id, visitorLabel, visitNumber }) => ({
+      id,
+      visitorLabel,
+      visitNumber,
+    })),
+    [
+      { id: "session-02", visitorLabel: "VISITOR", visitNumber: 2 },
+      { id: "session-01", visitorLabel: "VISITOR", visitNumber: 1 },
+    ],
+  );
 });
 
 test("selecting a history row switches the visible session and heatmap", () => {

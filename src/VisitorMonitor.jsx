@@ -216,7 +216,7 @@ export function VisitorMonitorView({
               <span className="visitor-monitor__eyebrow">
                 VISIT HISTORY · {snapshot.totalSessions}
               </span>
-              {snapshot.sessions.slice(0, 3).map((session) => (
+              {model.sessions.slice(0, 3).map((session) => (
                 <button
                   className={`visitor-monitor__visit ${
                     session.id === current.id ? "is-selected" : ""

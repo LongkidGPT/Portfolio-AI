@@ -26,6 +26,10 @@ export function buildVisitorMonitorModel({
   return {
     masked: mode === "blurred",
     maskLabel: mode === "blurred" ? "DATA MASKED" : null,
+    sessions: snapshot.sessions.map((session) => ({
+      ...session,
+      visitorLabel: "VISITOR",
+    })),
     current:
       current.id === "empty"
         ? current
