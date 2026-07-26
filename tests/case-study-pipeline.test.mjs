@@ -50,6 +50,7 @@ test("manifest contains ordered public paths and reserved dimensions", () => {
   assert.match(source, /export const caseStudies/);
   assert.match(source, /\/assets\/cases\/system\/slice-01\.webp/);
   assert.match(source, /"width": 1720/);
+  assert.doesNotMatch(source, /summary|background|responsibility|outcome/);
 });
 
 test("converter crops the exact source range and resizes to the planned slice", () => {

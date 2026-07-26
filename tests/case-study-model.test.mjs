@@ -17,6 +17,30 @@ test("case lookup returns the requested case and rejects unknown IDs", () => {
   assert.equal(getCaseStudy(manifest, null), null);
 });
 
+test("runtime lookup preserves durable summaries after the generated manifest is rebuilt", () => {
+  const regeneratedManifest = {
+    brand: {
+      id: "brand",
+      slices: [
+        {
+          src: "/assets/cases/brand/slice-01.webp",
+          width: 1720,
+          height: 4096,
+        },
+      ],
+    },
+  };
+
+  assert.deepEqual(getCaseStudy(regeneratedManifest, "brand"), {
+    ...regeneratedManifest.brand,
+    summary: {
+      background: "多品牌全球化扩张需要统一、清晰且可执行的视觉语言。",
+      responsibility: "负责光影、影像与场景规则模块，并推动跨品牌、跨团队应用。",
+      outcome: "形成可复用的视觉规范，支持全球市场一致、高效落地。",
+    },
+  });
+});
+
 test("every project card case id resolves to a runtime case study", () => {
   assert.deepEqual(
     projects.map((project) => getCaseStudy(caseStudies, project.caseId)?.id),

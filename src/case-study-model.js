@@ -1,6 +1,11 @@
+import { caseStudyContent } from "./case-study-content.js";
+
 export function getCaseStudy(manifest, caseId) {
   if (!caseId || !manifest[caseId]) return null;
-  return manifest[caseId];
+  return {
+    ...manifest[caseId],
+    ...caseStudyContent[caseId],
+  };
 }
 
 export function shouldDismissCaseStudy({ type, key, isBackdrop = false }) {
