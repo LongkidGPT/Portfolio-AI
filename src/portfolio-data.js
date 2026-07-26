@@ -26,13 +26,37 @@ export const principles = [
   },
 ];
 
+export function resolveProjectArtwork(
+  project,
+  { canHover, hoverRequested },
+) {
+  if (canHover === null) {
+    return {
+      defaultSrc: undefined,
+      hoverSrc: undefined,
+    };
+  }
+
+  if (!canHover) {
+    return {
+      defaultSrc: undefined,
+      hoverSrc: project.hoverImage,
+    };
+  }
+
+  return {
+    defaultSrc: project.defaultImage,
+    hoverSrc: hoverRequested ? project.hoverImage : undefined,
+  };
+}
+
 export const projects = [
   {
     id: "brand",
     caseId: "brand",
     className: "project-card--wide",
-    defaultImage: "/assets/work-brand-default.png",
-    hoverImage: "/assets/work-brand-hover.png",
+    defaultImage: "/assets/work-brand-default.webp",
+    hoverImage: "/assets/work-brand-hover.webp",
     artworkRatio: "3600 / 1860",
     temporaryArtworkRatio: "3600 / 1246",
     title: "品牌系统｜视觉语言定义",
@@ -43,8 +67,8 @@ export const projects = [
     id: "marketing",
     caseId: "marketing",
     className: "",
-    defaultImage: "/assets/work-marketing-default.png",
-    hoverImage: "/assets/work-marketing-hover.png",
+    defaultImage: "/assets/work-marketing-default.webp",
+    hoverImage: "/assets/work-marketing-hover.webp",
     artworkRatio: "1748 / 1602",
     temporaryArtworkRatio: "1748 / 929",
     title: "营销全案｜新品上市视觉",
@@ -54,8 +78,8 @@ export const projects = [
     id: "system",
     caseId: "system",
     className: "",
-    defaultImage: "/assets/work-system-default.png",
-    hoverImage: "/assets/work-system-hover.png",
+    defaultImage: "/assets/work-system-default.webp",
+    hoverImage: "/assets/work-system-hover.webp",
     artworkRatio: "1748 / 1602",
     temporaryArtworkRatio: "1748 / 929",
     title: "系统架构｜品牌包装规范",

@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { experience, principles, projects } from "./portfolio-data.js";
 import { CaseStudyModal } from "./CaseStudyModal.jsx";
@@ -75,12 +75,19 @@ function CopyButton({
 
 export function App() {
   const videoRef = useRef(null);
+  const backgroundRef = useRef(null);
+  const returnFocusRef = useRef(null);
   const [heroState, setHeroState] = useState("loading");
   const [selectedCaseId, setSelectedCaseId] = useState(null);
   const replayedRef = useRef(false);
   const selectedProject = projects.find(
     (project) => project.id === selectedCaseId,
   );
+  const handleOpenCase = useCallback((caseId) => {
+    returnFocusRef.current = document.activeElement;
+    setSelectedCaseId(caseId);
+  }, []);
+  const handleCloseCase = useCallback(() => setSelectedCaseId(null), []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -129,6 +136,7 @@ export function App() {
 
   return (
     <>
+      <div ref={backgroundRef}>
       <section
         className={`hero hero--${heroState}`}
         id="hero"
@@ -139,11 +147,11 @@ export function App() {
         <video
           ref={videoRef}
           className="hero__video"
-          src="/assets/hero-bg.mp4"
-          poster="/assets/hero-poster.jpg"
+          src="/assets/hero-bg-optimized.mp4"
+          poster="/assets/hero-poster.webp"
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           aria-hidden="true"
         />
         <div className="hero__scrim" />
@@ -236,7 +244,7 @@ export function App() {
                 <ProjectCard
                   key={project.id}
                   project={project}
-                  onOpenCase={setSelectedCaseId}
+                  onOpenCase={handleOpenCase}
                 />
               ))}
             </div>
@@ -278,10 +286,13 @@ export function App() {
         </section>
       </main>
       <VisitorMonitor />
+      </div>
       <CaseStudyModal
         caseId={selectedCaseId}
         title={selectedProject?.title ?? ""}
-        onClose={() => setSelectedCaseId(null)}
+        onClose={handleCloseCase}
+        backgroundRef={backgroundRef}
+        returnFocusRef={returnFocusRef}
       />
     </>
   );

@@ -64,7 +64,7 @@ a:focus-visible {
   z-index: 0;
   height: 100svh;
   overflow: hidden;
-  background: #001011 url("/assets/hero-poster.jpg") center center / cover no-repeat;
+  background: #001011 url("/assets/hero-poster.webp") center center / cover no-repeat;
 }
 
 .hero__video,
@@ -306,6 +306,15 @@ a:focus-visible {
   background: #111;
 }
 
+.case-study__heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .case-study__close {
   position: sticky;
   z-index: 1;
@@ -545,12 +554,12 @@ a:focus-visible {
   opacity: 0;
 }
 
-.project-card:is(:hover, :focus-visible) .project-card__image--default {
+.project-card--hover-ready:is(:hover, :focus-visible) .project-card__image--default {
   opacity: 0;
   transform: scale(1.012);
 }
 
-.project-card:is(:hover, :focus-visible) .project-card__image--hover {
+.project-card--hover-ready:is(:hover, :focus-visible) .project-card__image--hover {
   opacity: 1;
   transform: scale(1.012);
 }
@@ -670,7 +679,7 @@ a:focus-visible {
   min-height: 720px;
   place-items: center;
   overflow: hidden;
-  background: #001011 url("/assets/contact-bg.png") center / cover no-repeat;
+  background: #001011 url("/assets/contact-bg.webp") center / cover no-repeat;
   text-align: center;
 }
 

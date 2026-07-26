@@ -51,8 +51,8 @@ test("Experience section exposes the editorial career structure", async () => {
 test("hero uses the supplied video and poster assets", async () => {
   const app = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
 
-  assert.match(app, /\/assets\/hero-bg\.mp4/);
-  assert.match(app, /\/assets\/hero-poster\.jpg/);
+  assert.match(app, /\/assets\/hero-bg-optimized\.mp4/);
+  assert.match(app, /\/assets\/hero-poster\.webp/);
   assert.match(app, /muted/);
   assert.match(app, /playsInline/);
 });
