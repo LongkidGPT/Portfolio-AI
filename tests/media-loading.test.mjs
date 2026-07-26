@@ -127,6 +127,33 @@ test("hero motion asset stays within a 4 MiB delivery budget", async () => {
   );
 });
 
+test("legacy homepage source assets stay outside the public build input", async () => {
+  const legacyAssets = [
+    "hero-bg.mp4",
+    "hero-poster.jpg",
+    "contact-bg.png",
+    "work-brand-default.png",
+    "work-brand-hover.png",
+    "work-marketing-default.png",
+    "work-marketing-hover.png",
+    "work-system-default.png",
+    "work-system-hover.png",
+  ];
+
+  for (const filename of legacyAssets) {
+    await assert.rejects(
+      stat(repoFile(`/public/assets/${filename}`)),
+      ({ code }) => code === "ENOENT",
+      `${filename} must not be copied into the production build`,
+    );
+
+    const source = await stat(
+      repoFile(`/source-assets/homepage/${filename}`),
+    );
+    assert.ok(source.isFile() && source.size > 0);
+  }
+});
+
 test("document declares an existing favicon instead of requesting missing favicon.ico", async () => {
   const html = await readFile(repoFile("/index.html"), "utf8");
   const faviconPath = html.match(

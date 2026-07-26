@@ -20,6 +20,7 @@ export function CaseStudyModal({
 }) {
   const caseStudy = getCaseStudy(caseStudies, caseId);
   const accessibility = getCaseStudyAccessibility(title);
+  const summaryId = "case-study-summary";
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
   const [sliceStates, setSliceStates] = useState({});
@@ -73,6 +74,7 @@ export function CaseStudyModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby={accessibility.titleId}
+      aria-describedby={summaryId}
       onClick={handleBackdropClick}
     >
       <div className="case-study__document">
@@ -82,6 +84,16 @@ export function CaseStudyModal({
         >
           {accessibility.title}
         </h2>
+        <div className="case-study__summary" id={summaryId}>
+          <dl>
+            <dt>项目背景</dt>
+            <dd>{caseStudy.summary.background}</dd>
+            <dt>我的职责</dt>
+            <dd>{caseStudy.summary.responsibility}</dd>
+            <dt>项目成果</dt>
+            <dd>{caseStudy.summary.outcome}</dd>
+          </dl>
+        </div>
         <button
           ref={closeButtonRef}
           className="case-study__close"

@@ -306,7 +306,8 @@ a:focus-visible {
   background: #111;
 }
 
-.case-study__heading {
+.case-study__heading,
+.case-study__summary {
   position: absolute;
   width: 1px;
   height: 1px;
