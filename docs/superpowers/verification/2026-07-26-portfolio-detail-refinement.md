@@ -60,13 +60,16 @@ after the portfolio tab can remain foreground-controlled.
 | Lazy case resources | PASS | At desktop and 820px modal top, only brand slices 01–02 were requested. At 390px and 320px, the shorter slice height put 01–03 inside Chrome's initial lazy-load horizon. At 820px, scrolling to `5200px` requested 03–05 while 06 remained unloaded until the bottom. At 320px, 04–06 were not requested until scrolling to `1800px`. First-slice resource start preceded later batches in every run. |
 | Continuous case scrolling | PASS | All five adjacent brand-slice gaps measured `0px` at the top, middle, and bottom. At 820px, the 03→04 boundary appeared at viewport `y=510.73px` and the modal reached `scrollTop=max=8688px`; at 320px, the same boundary appeared at `y=326.67px` and the modal reached `scrollTop=max=3108px`. All six images had non-zero natural width by each bottom. No seam appeared in the middle/bottom screenshots. |
 | Modal close behavior | PASS | Close button, backdrop pointer click, and Escape each dismissed the dialog. Body overflow locked while open and restored afterward. Page scroll restored to its prior value and focus returned to the invoking project card. Sticky close remained fully visible at the bottom of the long case. |
+| Modal focus isolation | PASS | The page background becomes `inert` and `aria-hidden` while the dialog is open; Tab and Shift+Tab wrap inside the dialog; cleanup restores the prior attributes, body overflow, and invoking-card focus. |
+| Case-study accessibility | PASS | The dialog has one programmatic title; continuous visual slices use empty alt text and stay hidden from assistive technology instead of announcing repetitive page numbers. |
 | Mobile project behavior | PASS | Document scroll width equaled client width at 390 and 320. Artwork preceded the DOM panel; default/hover opacities computed to `0/1`; titles, descriptions, and arrows did not overlap. |
 | Experience ordering | PASS | At 820, 390, and 320, the intro rectangle preceded the career-list rectangle; mobile career rows were stacked at full list width. |
 | VisitorMonitor usability | PASS | The mobile bar stayed fully inside the viewport and could be collapsed to a 44px-high bar before card interaction. At 820, 390, and 320, its rectangle did not intersect the modal close rectangle; the modal also remained above it in stacking order. |
-| Live Signal aggregation | PASS | Three real opens of the Brand card rendered `品牌系统｜视觉语言定义 ×3`; each open contributed exactly one title-labelled click. Visit history rendered `VISITOR #01`. |
+| Live Signal aggregation | PASS | Three real opens of the Brand card rendered `品牌系统｜视觉语言定义 ×3`; each open contributed exactly one title-labelled click. Current and history rows render `VISITOR` while preserving their internal session identities. |
 | Copy feedback | PASS | Real clicks produced `已复制微信号` and `已复制邮箱` before the 1.8-second feedback reset. |
+| Media delivery | PASS | Homepage artwork, poster, and contact imagery use optimized WebP assets; Hero uses the optimized MP4 with `preload="metadata"`. Relevant delivery weight fell from 29.64 MiB to 3.77 MiB while original source assets remain available. Browser verification confirmed desktop hover-on-demand; the coarse-pointer single-image policy is covered by the artwork-policy regression test because the attempted 390 browser preset remained fine-pointer. |
 | Resources | PASS | All observed case WebP requests returned HTTP 200. No case-study PNG was requested by the browser. |
-| Console/page errors | PASS | `agent-browser errors` returned no page errors. Console output contained only Vite connection debug messages and the React DevTools development hint; no error-level entries appeared. |
+| Console/page errors | PASS | Focused desktop verification returned no page or console errors. A discovered implicit `favicon.ico` 404 was fixed by declaring the existing WebP poster as the favicon; its local resource returns HTTP 200 and the regression test prevents an undeclared favicon. |
 
 ## Representative screenshots
 
@@ -84,13 +87,15 @@ after the portfolio tab can remain foreground-controlled.
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-80-work.jpg`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-100-work.jpg`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-125-work.jpg`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/final-fix-desktop-1440-home.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/final-fix-mobile-390-layout-only.png`
 
 ## Automated final gate
 
-- `npm test`: PASS, 50 tests, 0 failures.
+- `npm test`: PASS, 62 tests, 0 failures.
 - `npm run build`: PASS, Vite transformed 4,583 modules and prepared the Sites build.
-- `git diff --check`: PASS, no output.
-- `git status --short` before this record: clean.
+- `git diff --check 63c1625..HEAD`: PASS after the final documentation cleanup, no output.
+- `git status --short`: clean after the final verification commit.
 
 ## Intentional temporary-artwork limitation
 

@@ -1,6 +1,6 @@
 # Portfolio Detail Refinement Design
 
-**Date:** 2026-07-26  
+**Date:** 2026-07-26
 **Status:** Approved by user
 **Scope:** Homepage visual refinement, responsive project cards, case-study modal, Experience layout, and visitor label simplification. No deployment.
 
