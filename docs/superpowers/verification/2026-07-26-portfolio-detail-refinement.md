@@ -36,9 +36,9 @@ browser level, not through CSS transforms or viewport replacement.
 
 | Chrome zoom | Live browser metrics | Page/card result | Modal result | Evidence | Status |
 | ---: | --- | --- | --- | --- | --- |
-| 80% | `inner=1715×860`, `devicePixelRatio=1.6`, no document overflow; card widths `944/457/457px`; copy-arrow gap `51px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-80-work.png` | PARTIAL |
-| 100% | `inner=1372×688`, `devicePixelRatio=2`, no document overflow; card widths `856/413/413px`; copy-arrow gap `41px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-100-work.png` | PARTIAL |
-| 125% | `inner=1097×550`, `devicePixelRatio=2.5`, no document overflow; card widths `685/327/327px`; copy-arrow gap `33px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-125-work.png` | PARTIAL |
+| 80% | `inner=1715×860`, `devicePixelRatio=1.6`, no document overflow; card widths `944/457/457px`; copy-arrow gap `51px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-80-work.jpg` | PARTIAL |
+| 100% | `inner=1372×688`, `devicePixelRatio=2`, no document overflow; card widths `856/413/413px`; copy-arrow gap `41px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-100-work.jpg` | PARTIAL |
+| 125% | `inner=1097×550`, `devicePixelRatio=2.5`, no document overflow; card widths `685/327/327px`; copy-arrow gap `33px`; no copy/arrow clipping | PASS | Not measured in the real-zoom focused run | `chrome-zoom-125-work.jpg` | PARTIAL |
 | 150% | The user changed Chrome's foreground state to YouTube while the claimed portfolio tab remained in the background. OS-level zoom shortcuts could not be sent safely to the background tab. | Not measured | Not measured | No valid screenshot | BLOCKED |
 
 The stopping condition is tooling/foreground ownership, not a discovered page
@@ -81,9 +81,9 @@ after the portfolio tab can remain foreground-controlled.
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-320-brand-modal.png`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-320-brand-modal-mid-fix1.png`
 - `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/mobile-320-brand-modal-bottom-fix1.png`
-- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-80-work.png`
-- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-100-work.png`
-- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-125-work.png`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-80-work.jpg`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-100-work.jpg`
+- `/Users/jade/Desktop/Longkid Folder/AIGC/Portflio Test 1.5/.worktrees/portfolio-home/.superpowers/sdd/2026-07-26-portfolio-detail-refinement/evidence/chrome-zoom-125-work.jpg`
 
 ## Automated final gate
 
