@@ -8,7 +8,8 @@
     "build": "vite build && node scripts/prepare-sites-build.mjs",
     "preview": "vite preview",
     "test": "node --test tests/*.test.mjs",
-    "test:sites": "node --test tests/sites-worker.test.mjs"
+    "test:sites": "node --test tests/sites-worker.test.mjs",
+    "assets:cases": "node scripts/convert-case-studies.mjs --source-root ../.."
   },
   "dependencies": {
     "@vitejs/plugin-react": "5.0.4",
