@@ -5,7 +5,11 @@ import { experience, principles, projects } from "./portfolio-data.js";
 import { CaseStudyModal } from "./CaseStudyModal.jsx";
 import { copyText } from "./copy-text.js";
 import { ExperienceSection } from "./ExperienceSection.jsx";
-import { resolveHeroMode } from "./hero-controller.js";
+import {
+  resolveHeroMode,
+  resolveHeroPhase,
+  resolveHeroPointer,
+} from "./hero-controller.js";
 import { ProjectCard } from "./ProjectCard.jsx";
 import { VisitorMonitor } from "./VisitorMonitor.jsx";
 
@@ -74,12 +78,13 @@ function CopyButton({
 }
 
 export function App() {
+  const heroRef = useRef(null);
   const videoRef = useRef(null);
+  const distortionVideoRef = useRef(null);
   const backgroundRef = useRef(null);
   const returnFocusRef = useRef(null);
   const [heroState, setHeroState] = useState("loading");
   const [selectedCaseId, setSelectedCaseId] = useState(null);
-  const replayedRef = useRef(false);
   const selectedProject = projects.find(
     (project) => project.id === selectedCaseId,
   );
@@ -91,15 +96,18 @@ export function App() {
 
   useEffect(() => {
     const video = videoRef.current;
+    const distortionVideo = distortionVideoRef.current;
     if (!video) return undefined;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    const compactViewport = window.matchMedia("(max-width: 760px)").matches;
     const mode = resolveHeroMode({
       reducedMotion,
       coarsePointer,
+      compactViewport,
       autoplayBlocked: false,
     });
 
@@ -108,52 +116,101 @@ export function App() {
       return undefined;
     }
 
+    const handleTimeUpdate = () => {
+      setHeroState(resolveHeroPhase(video.currentTime, video.duration || 8));
+
+      if (
+        distortionVideo &&
+        Math.abs(distortionVideo.currentTime - video.currentTime) > 0.12
+      ) {
+        distortionVideo.currentTime = video.currentTime;
+      }
+    };
+    const handleEnd = () => setHeroState("settled");
+
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("ended", handleEnd);
+
     const attemptPlayback = async () => {
       try {
         await video.play();
-        setHeroState("playing");
+        setHeroState("chaos");
+
+        if (mode === "interactive" && distortionVideo) {
+          distortionVideo.currentTime = video.currentTime;
+          distortionVideo.play().catch(() => {});
+        }
       } catch {
         setHeroState("settled");
       }
     };
 
     attemptPlayback();
-    const handleEnd = () => setHeroState("settled");
-    video.addEventListener("ended", handleEnd);
 
-    return () => video.removeEventListener("ended", handleEnd);
+    return () => {
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("ended", handleEnd);
+    };
   }, []);
 
-  const handleHeroPointerEnter = () => {
-    const video = videoRef.current;
-    if (!video || replayedRef.current || heroState !== "settled") return;
+  const handleHeroPointerMove = (event) => {
+    const hero = heroRef.current;
+    if (!hero) return;
     if (window.matchMedia("(pointer: coarse)").matches) return;
 
-    replayedRef.current = true;
-    video.currentTime = 0;
-    video.play().then(() => setHeroState("playing")).catch(() => {});
+    const { x, y } = resolveHeroPointer(event, hero.getBoundingClientRect());
+    hero.style.setProperty("--pointer-x", `${x}%`);
+    hero.style.setProperty("--pointer-y", `${y}%`);
+    hero.classList.add("hero--pointer-active");
+  };
+
+  const handleHeroPointerLeave = () => {
+    heroRef.current?.classList.remove("hero--pointer-active");
   };
 
   return (
     <>
       <div ref={backgroundRef}>
       <section
+        ref={heroRef}
         className={`hero hero--${heroState}`}
         id="hero"
         data-track-section
         data-track-label="HERO"
-        onPointerEnter={handleHeroPointerEnter}
+        onPointerMove={handleHeroPointerMove}
+        onPointerLeave={handleHeroPointerLeave}
       >
         <video
           ref={videoRef}
           className="hero__video"
           src="/assets/hero-bg-optimized.mp4"
-          poster="/assets/hero-poster.webp"
+          poster="/assets/hero-chaos.webp"
           muted
           playsInline
           preload="metadata"
           aria-hidden="true"
         />
+        <div className="hero__distortion" aria-hidden="true">
+          <video
+            ref={distortionVideoRef}
+            className="hero__distortion-video"
+            src="/assets/hero-bg-optimized.mp4"
+            poster="/assets/hero-chaos.webp"
+            muted
+            playsInline
+            preload="none"
+          />
+        </div>
+        <img
+          className="hero__final-scene"
+          src="/assets/hero-poster.webp"
+          alt=""
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          aria-hidden="true"
+        />
+        <div className="hero__pointer-light" aria-hidden="true" />
         <div className="hero__scrim" />
 
         <nav className="top-nav" aria-label="主导航">

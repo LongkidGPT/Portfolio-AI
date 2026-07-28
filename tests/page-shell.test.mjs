@@ -52,6 +52,7 @@ test("hero uses the supplied video and poster assets", async () => {
   const app = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
 
   assert.match(app, /\/assets\/hero-bg-optimized\.mp4/);
+  assert.match(app, /\/assets\/hero-chaos\.webp/);
   assert.match(app, /\/assets\/hero-poster\.webp/);
   assert.match(app, /muted/);
   assert.match(app, /playsInline/);
@@ -85,11 +86,7 @@ test("responsive CSS stacks mobile project artwork above its DOM panel", async (
   assert.match(css, /\.hero--settled \.hero__video\s*\{\s*opacity:\s*0/);
   assert.match(
     css,
-    /\.project-card__panel\s*\{[\s\S]*?min-height:\s*42%/,
-  );
-  assert.match(
-    css,
-    /\.project-card--wide \.project-card__panel\s*\{[\s\S]*?min-height:\s*33%/,
+    /\.project-card__panel\s*\{[\s\S]*?background:\s*transparent/,
   );
   assert.match(
     css,
@@ -109,10 +106,7 @@ test("responsive CSS stacks mobile project artwork above its DOM panel", async (
     mobile,
     /\.project-card--temporary-art \.project-card__artwork\s*\{[\s\S]*?aspect-ratio:\s*var\(--temporary-artwork-ratio\)/,
   );
-  assert.doesNotMatch(
-    css,
-    /\.project-card[^{]*\{[^}]*bottom:\s*\d+(?:\.\d+)?%/,
-  );
+  assert.doesNotMatch(cssDeclarations(baseCss(css), ".project-card"), /bottom:/);
 });
 
 test("touch and coarse pointers show project hover artwork by default", async () => {
@@ -131,6 +125,77 @@ test("touch and coarse pointers show project hover artwork by default", async ()
   );
 });
 
+test("desktop project cards preserve the supplied framed artwork proportions", async () => {
+  const css = await readFile(
+    new URL("../src/styles.css", import.meta.url),
+    "utf8",
+  );
+  const desktop = baseCss(css);
+  const mobile = css.slice(css.indexOf("@media (max-width: 760px)"));
+
+  assert.match(cssDeclarations(desktop, ".project-card"), /position:\s*relative/);
+  assert.match(cssDeclarations(desktop, ".project-card"), /border:\s*0/);
+  assert.doesNotMatch(
+    cssDeclarations(desktop, ".project-card"),
+    /border:\s*1px\s+solid/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".project-card__panel"),
+    /position:\s*absolute/,
+  );
+  assert.match(cssDeclarations(desktop, ".project-card__panel"), /inset:\s*0/);
+  assert.match(
+    cssDeclarations(desktop, ".project-card__panel"),
+    /background:\s*transparent/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".project-card__copy"),
+    /position:\s*absolute/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".project-card--wide .project-card__copy"),
+    /max-width:\s*48%/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".project-card__arrow"),
+    /display:\s*none/,
+  );
+  assert.match(
+    cssDeclarations(
+      desktop,
+      ".project-card:not(.project-card--wide) .project-card__copy strong",
+    ),
+    /font-size:\s*clamp\(16px,\s*1\.2vw,\s*22px\)[\s\S]*font-weight:\s*400/,
+  );
+  assert.match(
+    cssDeclarations(
+      desktop,
+      ".project-card:not(.project-card--wide) .project-card__copy",
+    ),
+    /max-width:\s*60%/,
+  );
+  assert.match(
+    cssDeclarations(
+      desktop,
+      ".project-card:not(.project-card--wide) .project-card__copy > span",
+    ),
+    /font-size:\s*clamp\(11px,\s*0\.82vw,\s*15px\)/,
+  );
+
+  assert.match(
+    cssDeclarations(mobile, ".project-card__panel"),
+    /position:\s*relative/,
+  );
+  assert.match(
+    mobile,
+    /\.project-card__copy,\s*\.project-card--wide \.project-card__copy,\s*\.project-card:not\(\.project-card--wide\) \.project-card__copy\s*\{[\s\S]*?position:\s*static;[\s\S]*?max-width:\s*none/,
+  );
+  assert.match(
+    cssDeclarations(mobile, ".project-card__arrow"),
+    /display:\s*grid/,
+  );
+});
+
 test("navigation uses one-pixel masked gradient borders", async () => {
   const css = await readFile(
     new URL("../src/styles.css", import.meta.url),
@@ -143,7 +208,7 @@ test("navigation uses one-pixel masked gradient borders", async () => {
   const navBorderRule = cssDeclarations(desktop, ".top-nav::before");
   const talkBorderRule = cssDeclarations(desktop, ".top-nav__talk::before");
   const gradientPattern =
-    /linear-gradient\(90deg,[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*0\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)/;
+    /linear-gradient\(180deg,[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*0\)[\s\S]*?rgba\(255,\s*255,\s*255,\s*1\)/;
   const navOpacity = Number(navBorderRule.match(/opacity:\s*([\d.]+)/)?.[1]);
   const talkOpacity = Number(talkBorderRule.match(/opacity:\s*([\d.]+)/)?.[1]);
 
@@ -224,7 +289,7 @@ test("zoom-stable CSS keeps tablet card copy and modal content in bounds", async
   assert.match(cssDeclarations(desktop, ".content-layer"), /overflow-x:\s*hidden/);
   assert.match(cssDeclarations(desktop, "img"), /max-width:\s*100%/);
   assert.match(cssDeclarations(desktop, ".case-study__document"), /max-width:\s*100%/);
-  assert.doesNotMatch(cssDeclarations(desktop, ".project-card__copy"), /bottom:\s*\d+%/);
+  assert.match(cssDeclarations(desktop, ".project-card__copy"), /bottom:\s*\d+%/);
 
   for (const selector of [
     ".top-nav__brand",

@@ -59,26 +59,45 @@ a:focus-visible {
 }
 
 .hero {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
   position: fixed;
   inset: 0;
   z-index: 0;
   height: 100svh;
   overflow: hidden;
-  background: #001011 url("/assets/hero-poster.webp") center center / cover no-repeat;
+  background: #001011 url("/assets/hero-chaos.webp") center center / cover no-repeat;
 }
 
 .hero__video,
+.hero__distortion,
+.hero__distortion-video,
+.hero__final-scene,
+.hero__pointer-light,
 .hero__scrim {
   position: absolute;
+}
+
+.hero__video,
+.hero__distortion,
+.hero__distortion-video,
+.hero__final-scene,
+.hero__scrim {
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.hero__video {
+.hero__video,
+.hero__distortion-video,
+.hero__final-scene {
   object-fit: cover;
   object-position: center center;
-  transition: opacity 700ms ease;
+}
+
+.hero__video {
+  z-index: 0;
+  transition: opacity 1200ms ease;
 }
 
 .hero--loading .hero__video {
@@ -89,7 +108,67 @@ a:focus-visible {
   opacity: 0;
 }
 
+.hero__distortion {
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  clip-path: circle(0 at var(--pointer-x) var(--pointer-y));
+  pointer-events: none;
+  transition:
+    clip-path 220ms ease,
+    opacity 220ms ease;
+}
+
+.hero__distortion-video {
+  transform: scale(1.018);
+  filter: brightness(1.2) saturate(1.12);
+}
+
+.hero--pointer-active:not(.hero--revealing):not(.hero--settled)
+  .hero__distortion {
+  opacity: 0.72;
+  clip-path: circle(clamp(76px, 8vw, 118px) at var(--pointer-x) var(--pointer-y));
+}
+
+.hero__final-scene {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 1900ms cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+
+.hero--revealing .hero__final-scene,
+.hero--settled .hero__final-scene {
+  opacity: 1;
+}
+
+.hero__pointer-light {
+  z-index: 3;
+  top: var(--pointer-y);
+  left: var(--pointer-x);
+  width: clamp(150px, 16vw, 260px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(95, 242, 246, 0.38) 0%,
+    rgba(53, 210, 216, 0.14) 28%,
+    rgba(31, 183, 190, 0.05) 52%,
+    transparent 72%
+  );
+  filter: blur(5px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.hero--pointer-active .hero__pointer-light {
+  opacity: 0.82;
+}
+
 .hero__scrim {
+  z-index: 4;
   pointer-events: none;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.32) 0%, transparent 42%),
@@ -98,7 +177,7 @@ a:focus-visible {
 
 .top-nav {
   position: absolute;
-  z-index: 3;
+  z-index: 6;
   top: clamp(22px, 4.2vh, 42px);
   left: 50%;
   display: grid;
@@ -128,7 +207,7 @@ a:focus-visible {
 
 .top-nav::before {
   padding: 1px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 1) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 1) 100%);
   opacity: 0.26;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -169,7 +248,7 @@ a:focus-visible {
 
 .top-nav__talk::before {
   padding: 1px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 1) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 1) 100%);
   opacity: 0.18;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -183,18 +262,22 @@ a:focus-visible {
 
 .hero__content {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   top: 17.5%;
   left: 50%;
   width: min(90vw, 880px);
-  transform: translateX(-50%);
+  transform: translate(-50%, 18px);
   text-align: center;
   opacity: 0;
-  animation: hero-copy-in 1000ms 1600ms ease forwards;
+  transition:
+    opacity 1000ms 280ms ease,
+    transform 1000ms 280ms ease;
 }
 
+.hero--revealing .hero__content,
 .hero--settled .hero__content {
-  animation-delay: 100ms;
+  transform: translate(-50%, 0);
+  opacity: 1;
 }
 
 .hero__content h1 {
@@ -508,11 +591,12 @@ a:focus-visible {
 }
 
 .project-card {
+  position: relative;
   display: grid;
   width: 100%;
   overflow: hidden;
   padding: 0;
-  border: 1px solid rgba(109, 231, 231, 0.22);
+  border: 0;
   border-radius: 10px;
   background: #001111;
   color: inherit;
@@ -566,27 +650,34 @@ a:focus-visible {
 }
 
 .project-card__panel {
+  position: absolute;
+  inset: 0;
   z-index: 2;
-  display: grid;
-  grid-area: 1 / 1;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-self: end;
-  align-items: center;
-  min-height: 42%;
-  padding: clamp(24px, 3.2vw, 54px) clamp(24px, 3.4vw, 58px);
-  gap: clamp(20px, 3vw, 52px);
-  background: rgba(0, 13, 14, 0.97);
+  display: block;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  pointer-events: none;
 }
 
 .project-card--wide .project-card__panel {
-  min-height: 33%;
+  min-height: 0;
 }
 
 .project-card__copy {
+  position: absolute;
+  left: 7%;
+  bottom: 8%;
   display: grid;
   min-width: 0;
-  max-width: 760px;
+  max-width: 70%;
   gap: 14px;
+}
+
+.project-card--wide .project-card__copy {
+  left: 5.6%;
+  bottom: 9.4%;
+  max-width: 48%;
 }
 
 .project-card__copy strong {
@@ -602,8 +693,21 @@ a:focus-visible {
   overflow-wrap: break-word;
 }
 
+.project-card:not(.project-card--wide) .project-card__copy strong {
+  font-size: clamp(16px, 1.2vw, 22px);
+  font-weight: 400;
+}
+
+.project-card:not(.project-card--wide) .project-card__copy {
+  max-width: 60%;
+}
+
+.project-card:not(.project-card--wide) .project-card__copy > span {
+  font-size: clamp(11px, 0.82vw, 15px);
+}
+
 .project-card__arrow {
-  display: grid;
+  display: none;
   width: clamp(48px, 4.6vw, 76px);
   aspect-ratio: 1;
   place-items: center;
@@ -1191,6 +1295,11 @@ a:focus-visible {
 }
 
 @media (hover: none), (pointer: coarse) {
+  .hero__distortion,
+  .hero__pointer-light {
+    display: none;
+  }
+
   .project-card__image--default {
     opacity: 0;
   }
@@ -1302,6 +1411,11 @@ a:focus-visible {
     object-position: center center;
   }
 
+  .hero__distortion,
+  .hero__pointer-light {
+    display: none;
+  }
+
   .hero__content {
     top: 19%;
     width: calc(100vw - 36px);
@@ -1384,38 +1498,43 @@ a:focus-visible {
     aspect-ratio: var(--temporary-artwork-ratio);
   }
 
-  .project-card__image--hover {
-    opacity: 1;
-  }
-
-  .project-card__image--default {
-    opacity: 0;
-  }
-
   .project-card__panel,
   .project-card--wide .project-card__panel {
+    position: relative;
+    inset: auto;
+    display: grid;
     grid-area: 2 / 1;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-self: stretch;
+    align-items: center;
     min-height: 0;
     padding: 20px;
     gap: 16px;
+    background: rgba(0, 13, 14, 0.97);
+    pointer-events: auto;
   }
 
-  .project-card__copy {
+  .project-card__copy,
+  .project-card--wide .project-card__copy,
+  .project-card:not(.project-card--wide) .project-card__copy {
+    position: static;
     max-width: none;
     gap: 9px;
   }
 
-  .project-card__copy strong {
+  .project-card__copy strong,
+  .project-card:not(.project-card--wide) .project-card__copy strong {
     font-size: 14px;
   }
 
-  .project-card__copy > span {
+  .project-card__copy > span,
+  .project-card:not(.project-card--wide) .project-card__copy > span {
     font-size: 11px;
     line-height: 1.6;
   }
 
   .project-card__arrow {
+    display: grid;
     width: 44px;
   }
 
@@ -1483,7 +1602,8 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 
-  .hero__video {
+  .hero__video,
+  .hero__distortion {
     display: none;
   }
 }
