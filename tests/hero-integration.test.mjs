@@ -41,6 +41,47 @@ test("scrub hook installs cancellable desktop, touch, and keyboard input", async
   assert.match(source, /4000/);
 });
 
+test("scrub waits for the final requested video frame to be presented", async () => {
+  const source = await readFile(
+    new URL("../src/use-hero-scroll-scrub.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /lastPresentedProgress/);
+  assert.match(
+    source,
+    /requestVideoFrameCallback\(\(\) => \{[\s\S]*?lastPresentedProgress = requestedProgress/,
+  );
+  assert.match(source, /requestSeek\(rendered \* finalUsableTime, rendered\)/);
+  assert.match(
+    source,
+    /rendered >= 0\.999 &&[\s\S]*?lastPresentedProgress === 1 &&/,
+  );
+});
+
+test("HeroSection disables and restores pointer RAF when media queries change", async () => {
+  const source = await readFile(
+    new URL("../src/HeroSection.jsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.equal(
+    source.match(/addEventListener\("change", handlePointerModeChange\)/g)
+      ?.length,
+    2,
+  );
+  assert.equal(
+    source.match(
+      /removeEventListener\(\s*"change",\s*handlePointerModeChange,?\s*\)/g,
+    )?.length,
+    2,
+  );
+  assert.match(source, /pointerEnabledRef\.current/);
+  assert.match(source, /window\.cancelAnimationFrame\(frameId\)/);
+  assert.match(source, /hero\.style\.setProperty\("--stage-x", "0px"\)/);
+  assert.match(source, /hero\.style\.setProperty\("--light-opacity", 0\)/);
+});
+
 test("App delegates the Hero without changing the remaining page sections", async () => {
   const source = await readFile(
     new URL("../src/App.jsx", import.meta.url),

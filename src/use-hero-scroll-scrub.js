@@ -63,6 +63,8 @@ export function useHeroScrollScrub({ videoRef }) {
     let animationFrameId = 0;
     let videoFrameId = null;
     let disposed = false;
+    let lastPresentedProgress = 0;
+    let fallbackSeekProgress = null;
     let touchPoint = null;
 
     const handleMetadata = () => {
@@ -72,6 +74,12 @@ export function useHeroScrollScrub({ videoRef }) {
     const handleReady = () => {
       handleMetadata();
       window.clearTimeout(failureTimerId);
+    };
+
+    const handleSeeked = () => {
+      if (fallbackSeekProgress === null) return;
+      lastPresentedProgress = fallbackSeekProgress;
+      fallbackSeekProgress = null;
     };
 
     const failureTimerId = window.setTimeout(failMedia, 4000);
@@ -169,11 +177,15 @@ export function useHeroScrollScrub({ videoRef }) {
       publishInput(window.innerHeight * 0.28, event);
     };
 
-    const requestSeek = (nextTime) => {
+    const requestSeek = (nextTime, requestedProgress) => {
+      const needsFinalFrame =
+        requestedProgress === 1 && lastPresentedProgress !== 1;
+
       if (
         !readyRef.current ||
         !Number.isFinite(video.duration) ||
-        Math.abs(video.currentTime - nextTime) < 1 / 48
+        (!needsFinalFrame &&
+          Math.abs(video.currentTime - nextTime) < 1 / 48)
       ) {
         return;
       }
@@ -182,11 +194,14 @@ export function useHeroScrollScrub({ videoRef }) {
         if (videoFrameId !== null) return;
         video.currentTime = nextTime;
         videoFrameId = video.requestVideoFrameCallback(() => {
+          lastPresentedProgress = requestedProgress;
           videoFrameId = null;
         });
         return;
       }
 
+      if (fallbackSeekProgress !== null) return;
+      fallbackSeekProgress = requestedProgress;
       video.currentTime = nextTime;
     };
 
@@ -200,11 +215,12 @@ export function useHeroScrollScrub({ videoRef }) {
       renderedProgressRef.current = rendered;
 
       const finalUsableTime = Math.max((video.duration || 8) - 1 / 24, 0);
-      requestSeek(rendered * finalUsableTime);
+      requestSeek(rendered * finalUsableTime, rendered);
 
       if (
         target === 1 &&
         rendered >= 0.999 &&
+        lastPresentedProgress === 1 &&
         modelRef.current.state === HERO_STATES.SCRUBBING
       ) {
         publish({ state: HERO_STATES.RESOLVING, progress: 1 });
@@ -218,6 +234,7 @@ export function useHeroScrollScrub({ videoRef }) {
     video.addEventListener("loadedmetadata", handleMetadata);
     video.addEventListener("loadeddata", handleReady);
     video.addEventListener("canplay", handleReady);
+    video.addEventListener("seeked", handleSeeked);
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchmove", handleTouchMove, { passive: false });
@@ -235,6 +252,7 @@ export function useHeroScrollScrub({ videoRef }) {
       video.removeEventListener("loadedmetadata", handleMetadata);
       video.removeEventListener("loadeddata", handleReady);
       video.removeEventListener("canplay", handleReady);
+      video.removeEventListener("seeked", handleSeeked);
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);

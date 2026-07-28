@@ -9,6 +9,15 @@ import {
 } from "./hero-parallax.js";
 import { useHeroScrollScrub } from "./use-hero-scroll-scrub.js";
 
+const NEUTRAL_POINTER = {
+  x: 0,
+  y: 0,
+  percentX: 50,
+  percentY: 50,
+  lightScale: 0.96,
+  lightOpacity: 0,
+};
+
 export function HeroSection() {
   const heroRef = useRef(null);
   const videoRef = useRef(null);
@@ -18,29 +27,38 @@ export function HeroSection() {
     failMedia,
     releaseHero,
   } = useHeroScrollScrub({ videoRef });
-  const pointerTargetRef = useRef({
-    x: 0,
-    y: 0,
-    percentX: 50,
-    percentY: 50,
-    lightScale: 0.96,
-    lightOpacity: 0,
-  });
+  const pointerTargetRef = useRef({ ...NEUTRAL_POINTER });
   const pointerCurrentRef = useRef({ ...pointerTargetRef.current });
+  const pointerEnabledRef = useRef(false);
   const previousPointerRef = useRef(null);
 
   useEffect(() => {
     const hero = heroRef.current;
     if (!hero) return undefined;
-    if (
-      window.matchMedia("(pointer: coarse)").matches ||
-      window.matchMedia("(max-width: 760px)").matches
-    ) {
-      return undefined;
-    }
 
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+    const compactViewportQuery = window.matchMedia("(max-width: 760px)");
     let frameId = 0;
+
+    const resetPointer = () => {
+      pointerTargetRef.current = { ...NEUTRAL_POINTER };
+      pointerCurrentRef.current = { ...NEUTRAL_POINTER };
+      previousPointerRef.current = null;
+      hero.style.setProperty("--stage-x", "0px");
+      hero.style.setProperty("--stage-y", "0px");
+      hero.style.setProperty("--stage-rx", "0deg");
+      hero.style.setProperty("--stage-ry", "0deg");
+      hero.style.setProperty("--stage-scale", 1.04);
+      hero.style.setProperty("--light-x", "50%");
+      hero.style.setProperty("--light-y", "50%");
+      hero.style.setProperty("--light-scale", 0.96);
+      hero.style.setProperty("--light-opacity", 0);
+    };
+
     const renderPointer = () => {
+      frameId = 0;
+      if (!pointerEnabledRef.current) return;
+
       const current = pointerCurrentRef.current;
       const target = pointerTargetRef.current;
 
@@ -61,19 +79,46 @@ export function HeroSection() {
       frameId = window.requestAnimationFrame(renderPointer);
     };
 
-    frameId = window.requestAnimationFrame(renderPointer);
-    return () => window.cancelAnimationFrame(frameId);
+    const handlePointerModeChange = () => {
+      const enabled =
+        !coarsePointerQuery.matches && !compactViewportQuery.matches;
+      pointerEnabledRef.current = enabled;
+
+      if (!enabled) {
+        if (frameId !== 0) {
+          window.cancelAnimationFrame(frameId);
+          frameId = 0;
+        }
+        resetPointer();
+        return;
+      }
+
+      if (frameId === 0) {
+        frameId = window.requestAnimationFrame(renderPointer);
+      }
+    };
+
+    coarsePointerQuery.addEventListener("change", handlePointerModeChange);
+    compactViewportQuery.addEventListener("change", handlePointerModeChange);
+    handlePointerModeChange();
+
+    return () => {
+      pointerEnabledRef.current = false;
+      if (frameId !== 0) {
+        window.cancelAnimationFrame(frameId);
+      }
+      coarsePointerQuery.removeEventListener("change", handlePointerModeChange);
+      compactViewportQuery.removeEventListener(
+        "change",
+        handlePointerModeChange,
+      );
+    };
   }, []);
 
   const handlePointerMove = (event) => {
     const hero = heroRef.current;
     if (!hero) return;
-    if (
-      window.matchMedia("(pointer: coarse)").matches ||
-      window.matchMedia("(max-width: 760px)").matches
-    ) {
-      return;
-    }
+    if (!pointerEnabledRef.current) return;
 
     const normalized = normalizeHeroPointer(
       event,
@@ -104,14 +149,7 @@ export function HeroSection() {
   };
 
   const handlePointerLeave = () => {
-    pointerTargetRef.current = {
-      x: 0,
-      y: 0,
-      percentX: 50,
-      percentY: 50,
-      lightScale: 0.96,
-      lightOpacity: 0,
-    };
+    pointerTargetRef.current = { ...NEUTRAL_POINTER };
     previousPointerRef.current = null;
   };
 
