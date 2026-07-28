@@ -42,9 +42,9 @@ test("positive input advances monotonically and one large event is capped", () =
   const huge = advanceHeroScrub(backward, 10000, 800);
 
   assert.equal(first.state, HERO_STATES.SCRUBBING);
-  assert.equal(first.progress, 0.25);
+  assert.equal(first.progress, 0.1590909090909091);
   assert.deepEqual(backward, first);
-  assert.equal(huge.progress, 0.4090909090909091);
+  assert.equal(huge.progress, 0.3181818181818182);
 });
 
 test("completion enters resolving and cannot rewind", () => {

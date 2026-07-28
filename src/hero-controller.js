@@ -9,7 +9,7 @@ export const HERO_STATES = Object.freeze({
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 export function getHeroScrubDistance(viewportHeight) {
-  return clamp((viewportHeight * 22) / 10, 1200, 2200);
+  return Math.round(clamp(viewportHeight * 2.2, 1200, 2200));
 }
 
 export function normalizeWheelDelta(
@@ -42,10 +42,7 @@ export function advanceHeroScrub(model, deltaPixels, viewportHeight) {
   }
 
   const distance = getHeroScrubDistance(viewportHeight);
-  const cappedDelta =
-    deltaPixels > distance
-      ? Math.min(deltaPixels, viewportHeight * 0.35)
-      : deltaPixels;
+  const cappedDelta = Math.min(deltaPixels, viewportHeight * 0.35);
   const progress = Number(
     clamp(model.progress + cappedDelta / distance, 0, 1).toPrecision(16),
   );
