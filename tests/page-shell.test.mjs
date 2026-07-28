@@ -19,11 +19,12 @@ function baseCss(css) {
 }
 
 test("page shell contains all five navigation destinations", async () => {
-  const [app, experienceSection] = await Promise.all([
+  const [app, heroSection, experienceSection] = await Promise.all([
     readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/HeroSection.jsx", import.meta.url), "utf8"),
     readFile(new URL("../src/ExperienceSection.jsx", import.meta.url), "utf8"),
   ]);
-  const pageShell = `${app}\n${experienceSection}`;
+  const pageShell = `${app}\n${heroSection}\n${experienceSection}`;
 
   for (const id of ["hero", "approach", "work", "experience", "contact"]) {
     assert.match(pageShell, new RegExp(`id="${id}"`));
@@ -49,13 +50,20 @@ test("Experience section exposes the editorial career structure", async () => {
 });
 
 test("hero uses the supplied video and poster assets", async () => {
-  const app = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const hero = await readFile(
+    new URL("../src/HeroSection.jsx", import.meta.url),
+    "utf8",
+  );
 
-  assert.match(app, /\/assets\/hero-bg-optimized\.mp4/);
-  assert.match(app, /\/assets\/hero-chaos\.webp/);
-  assert.match(app, /\/assets\/hero-poster\.webp/);
-  assert.match(app, /muted/);
-  assert.match(app, /playsInline/);
+  assert.match(hero, /\/assets\/hero-bg-optimized\.mp4/);
+  assert.match(hero, /\/assets\/hero-first-frame\.webp/);
+  assert.match(hero, /\/assets\/hero-poster\.webp/);
+  assert.match(hero, /className=\{`hero hero--\$\{heroState\}`\}/);
+  assert.match(hero, /useHeroScrollScrub\(\{ videoRef \}\)/);
+  assert.match(hero, /muted/);
+  assert.match(hero, /playsInline/);
+  assert.doesNotMatch(hero, /hero--settled/);
+  assert.doesNotMatch(hero, /hero__distortion/);
 });
 
 test("project cards own semantic artwork, copy, and case-opening markup", async () => {
@@ -83,7 +91,6 @@ test("responsive CSS stacks mobile project artwork above its DOM panel", async (
     "utf8",
   );
 
-  assert.match(css, /\.hero--settled \.hero__video\s*\{\s*opacity:\s*0/);
   assert.match(
     css,
     /\.project-card__panel\s*\{[\s\S]*?background:\s*transparent/,
