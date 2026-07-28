@@ -13,6 +13,7 @@ import {
 
 test("scrub distance follows the approved viewport clamp", () => {
   assert.equal(getHeroScrubDistance(400), 1200);
+  assert.equal(getHeroScrubDistance(601), 1322.2);
   assert.equal(getHeroScrubDistance(800), 1760);
   assert.equal(getHeroScrubDistance(1400), 2200);
 });

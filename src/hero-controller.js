@@ -9,7 +9,7 @@ export const HERO_STATES = Object.freeze({
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 export function getHeroScrubDistance(viewportHeight) {
-  return Math.round(clamp(viewportHeight * 2.2, 1200, 2200));
+  return clamp((viewportHeight * 22) / 10, 1200, 2200);
 }
 
 export function normalizeWheelDelta(
