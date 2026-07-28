@@ -380,3 +380,26 @@ test("case-study modal renders the required accessible document shell", async ()
     /@media \(max-width: 760px\)[\s\S]*?\.case-study__document\s*\{[\s\S]*?width:\s*calc\(100vw - 24px\)/,
   );
 });
+
+test("Hero CSS shares one parallax stage and reveals content in order", async () => {
+  const css = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+
+  assert.match(css, /\.hero__stage\s*\{[\s\S]*?--stage-scale/);
+  assert.match(css, /\.hero__stage\s*\{[\s\S]*?perspective/);
+  assert.match(css, /\.hero__video,[\s\S]*?\.hero__final-scene\s*\{[\s\S]*?object-fit:\s*cover/);
+  assert.match(css, /\.hero__final-scene\s*\{[\s\S]*?1050ms/);
+  assert.match(css, /@keyframes hero-title-in/);
+  assert.match(css, /@keyframes hero-subtitle-in/);
+  assert.match(css, /@keyframes hero-primary-in/);
+  assert.match(css, /@keyframes hero-wechat-in/);
+  assert.match(css, /url\("\/assets\/hero-light-spot\.png"\)|hero__pointer-light/);
+});
+
+test("Contact uses the optimized replacement background", async () => {
+  const css = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+
+  assert.match(
+    css,
+    /\.contact\s*\{[\s\S]*?url\("\/assets\/contact-bg\.webp"\)[\s\S]*?cover/,
+  );
+});
