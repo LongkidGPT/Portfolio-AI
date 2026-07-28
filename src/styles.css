@@ -73,7 +73,11 @@ a:focus-visible {
   z-index: 0;
   height: 100svh;
   overflow: hidden;
-  background: #001011 url("/assets/hero-chaos.webp") center center / cover no-repeat;
+  background:
+    #001011
+    url("/assets/hero-first-frame.webp")
+    center center / cover
+    no-repeat;
 }
 
 .hero__stage {
@@ -251,6 +255,17 @@ a:focus-visible {
   width: min(90vw, 880px);
   transform: translateX(-50%);
   text-align: center;
+}
+
+.hero--ready .hero__content,
+.hero--scrubbing .hero__content,
+.hero--resolving .hero__content {
+  pointer-events: none;
+}
+
+.hero--revealed .hero__content,
+.hero--released .hero__content {
+  pointer-events: auto;
 }
 
 .hero__content h1,

@@ -172,6 +172,9 @@ export function HeroSection() {
       completeReveal();
     }
   };
+  const contentIsHidden = ["ready", "scrubbing", "resolving"].includes(
+    heroState,
+  );
 
   return (
     <section
@@ -235,7 +238,11 @@ export function HeroSection() {
         </a>
       </nav>
 
-      <div className="hero__content">
+      <div
+        className="hero__content"
+        inert={contentIsHidden ? true : undefined}
+        aria-hidden={contentIsHidden ? true : undefined}
+      >
         <h1>
           Design for Business
           <br />

@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { dirname, isAbsolute, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -10,8 +10,12 @@ import {
 } from "./case-study-pipeline.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const defaultSourceRoot = resolve(projectRoot, "../..");
-const cwebpPath = "/opt/homebrew/bin/cwebp";
+const defaultOutputRoot = resolve(projectRoot, "public", "assets", "cases");
+const defaultManifestPath = resolve(
+  projectRoot,
+  "src",
+  "case-study-manifest.js",
+);
 
 const sources = [
   { id: "brand", filename: "品牌系统-案例.png", width: 2656, height: 32768 },
@@ -47,21 +51,36 @@ export function buildCwebpArgs({ sourcePath, sourceWidth, outputPath, slice }) {
   ];
 }
 
-function parseSourceRoot(argv) {
-  const optionIndex = argv.indexOf("--source-root");
+function readOption(argv, optionName) {
+  const optionIndex = argv.indexOf(optionName);
+  if (optionIndex === -1) return null;
 
-  if (optionIndex === -1) {
-    return defaultSourceRoot;
+  const value = argv[optionIndex + 1];
+  if (!value || value.startsWith("--")) {
+    const expectedValue =
+      optionName === "--source-root" ? "a directory path" : "a value";
+    throw new Error(`${optionName} requires ${expectedValue}`);
   }
 
-  const sourceRoot = argv[optionIndex + 1];
-  if (!sourceRoot || sourceRoot.startsWith("--")) {
-    throw new Error("--source-root requires a directory path");
+  return value;
+}
+
+export function parseConversionOptions(
+  argv,
+  { cwd = process.cwd(), env = process.env } = {},
+) {
+  const sourceRoot = readOption(argv, "--source-root");
+  if (!sourceRoot) {
+    throw new Error(
+      "Missing required --source-root <directory>. Run npm run assets:cases -- --source-root /path/to/approved-masters.",
+    );
   }
 
-  return isAbsolute(sourceRoot)
-    ? sourceRoot
-    : resolve(process.cwd(), sourceRoot);
+  return {
+    sourceRoot: resolve(cwd, sourceRoot),
+    cwebpCommand:
+      readOption(argv, "--cwebp") || env.CWEBP_BIN || "cwebp",
+  };
 }
 
 async function validateSource(source, sourceRoot) {
@@ -77,25 +96,40 @@ async function validateSource(source, sourceRoot) {
   return sourcePath;
 }
 
-async function convertPlan(plan, sourcePath) {
-  const outputDirectory = resolve(projectRoot, "public", "assets", "cases", plan.id);
+export async function convertPlan(
+  plan,
+  sourcePath,
+  {
+    cwebpCommand = "cwebp",
+    env = process.env,
+    outputRoot = defaultOutputRoot,
+  } = {},
+) {
+  const outputDirectory = resolve(outputRoot, plan.id);
   await mkdir(outputDirectory, { recursive: true });
 
   for (const slice of plan.slices) {
     const outputPath = resolve(outputDirectory, slice.filename);
     const result = spawnSync(
-      cwebpPath,
+      cwebpCommand,
       buildCwebpArgs({
         sourcePath,
         sourceWidth: plan.width,
         outputPath,
         slice,
       }),
-      { stdio: "inherit" },
+      { env, stdio: "inherit" },
     );
 
     if (result.error) {
-      throw result.error;
+      if (result.error.code === "ENOENT") {
+        throw new Error(
+          `Unable to run cwebp command "${cwebpCommand}". Install cwebp on PATH or pass --cwebp <path> (or set CWEBP_BIN).`,
+        );
+      }
+      throw new Error(
+        `Unable to run cwebp command "${cwebpCommand}": ${result.error.message}`,
+      );
     }
     if (result.status !== 0) {
       throw new Error(`cwebp failed while writing ${outputPath}`);
@@ -103,21 +137,36 @@ async function convertPlan(plan, sourcePath) {
   }
 }
 
-async function main() {
-  const sourceRoot = parseSourceRoot(process.argv.slice(2));
+export async function runConversion({
+  sourceRoot,
+  cwebpCommand = "cwebp",
+  env = process.env,
+  manifestPath = defaultManifestPath,
+  outputRoot = defaultOutputRoot,
+}) {
   const sourcePaths = await Promise.all(
     sources.map((source) => validateSource(source, sourceRoot)),
   );
   const plans = sources.map((source) => buildCaseStudyPlan(source));
 
   for (const [index, plan] of plans.entries()) {
-    await convertPlan(plan, sourcePaths[index]);
+    await convertPlan(plan, sourcePaths[index], {
+      cwebpCommand,
+      env,
+      outputRoot,
+    });
   }
 
+  await mkdir(dirname(manifestPath), { recursive: true });
   await writeFile(
-    resolve(projectRoot, "src", "case-study-manifest.js"),
+    manifestPath,
     renderCaseStudyManifest(plans),
   );
+}
+
+async function main() {
+  const options = parseConversionOptions(process.argv.slice(2));
+  await runConversion(options);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

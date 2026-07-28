@@ -10,6 +10,25 @@ import {
 } from "./hero-controller.js";
 
 const ADVANCE_KEYS = new Set(["ArrowDown", "PageDown", " "]);
+const INTERACTIVE_KEY_TARGETS =
+  "a, button, input, select, textarea, [contenteditable]:not([contenteditable='false'])";
+
+function shouldOwnHeroKeyDown(event) {
+  if (
+    !ADVANCE_KEYS.has(event.key) ||
+    event.defaultPrevented ||
+    event.repeat ||
+    event.isComposing ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.shiftKey
+  ) {
+    return false;
+  }
+
+  return !event.target?.closest?.(INTERACTIVE_KEY_TARGETS);
+}
 
 export function useHeroScrollScrub({ videoRef }) {
   const [model, setModel] = useState({
@@ -48,14 +67,14 @@ export function useHeroScrollScrub({ videoRef }) {
     const video = videoRef.current;
     if (!video) return undefined;
 
-    const reducedMotion = window.matchMedia(
+    const reducedMotionQuery = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
-    ).matches;
+    );
 
     video.pause();
     video.currentTime = 0;
 
-    if (reducedMotion) {
+    if (reducedMotionQuery.matches) {
       publish({ state: HERO_STATES.RELEASED, progress: 1 });
       return undefined;
     }
@@ -65,7 +84,34 @@ export function useHeroScrollScrub({ videoRef }) {
     let disposed = false;
     let lastPresentedProgress = 0;
     let fallbackSeekProgress = null;
+    let seekWatchdogId = null;
     let touchPoint = null;
+
+    const clearSeekWatchdog = () => {
+      if (seekWatchdogId === null) return;
+      window.clearTimeout(seekWatchdogId);
+      seekWatchdogId = null;
+    };
+
+    const cancelInFlightSeek = () => {
+      clearSeekWatchdog();
+      if (videoFrameId !== null && "cancelVideoFrameCallback" in video) {
+        video.cancelVideoFrameCallback(videoFrameId);
+      }
+      videoFrameId = null;
+      fallbackSeekProgress = null;
+    };
+
+    const handleMediaFailure = () => {
+      window.clearTimeout(failureTimerId);
+      cancelInFlightSeek();
+      failMedia();
+    };
+
+    const armSeekWatchdog = () => {
+      clearSeekWatchdog();
+      seekWatchdogId = window.setTimeout(handleMediaFailure, 4000);
+    };
 
     const handleMetadata = () => {
       readyRef.current = true;
@@ -80,9 +126,15 @@ export function useHeroScrollScrub({ videoRef }) {
       if (fallbackSeekProgress === null) return;
       lastPresentedProgress = fallbackSeekProgress;
       fallbackSeekProgress = null;
+      clearSeekWatchdog();
     };
 
-    const failureTimerId = window.setTimeout(failMedia, 4000);
+    const failureTimerId = window.setTimeout(handleMediaFailure, 4000);
+
+    const handleReducedMotionChange = (event) => {
+      if (!event.matches) return;
+      handleMediaFailure();
+    };
 
     if (video.readyState >= 1) {
       handleMetadata();
@@ -173,7 +225,7 @@ export function useHeroScrollScrub({ videoRef }) {
     };
 
     const handleKeyDown = (event) => {
-      if (!ADVANCE_KEYS.has(event.key)) return;
+      if (!shouldOwnHeroKeyDown(event)) return;
       publishInput(window.innerHeight * 0.28, event);
     };
 
@@ -196,13 +248,16 @@ export function useHeroScrollScrub({ videoRef }) {
         videoFrameId = video.requestVideoFrameCallback(() => {
           lastPresentedProgress = requestedProgress;
           videoFrameId = null;
+          clearSeekWatchdog();
         });
+        armSeekWatchdog();
         return;
       }
 
       if (fallbackSeekProgress !== null) return;
       fallbackSeekProgress = requestedProgress;
       video.currentTime = nextTime;
+      armSeekWatchdog();
     };
 
     const render = () => {
@@ -235,6 +290,10 @@ export function useHeroScrollScrub({ videoRef }) {
     video.addEventListener("loadeddata", handleReady);
     video.addEventListener("canplay", handleReady);
     video.addEventListener("seeked", handleSeeked);
+    video.addEventListener("stalled", handleMediaFailure);
+    video.addEventListener("abort", handleMediaFailure);
+    video.addEventListener("error", handleMediaFailure);
+    reducedMotionQuery.addEventListener("change", handleReducedMotionChange);
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchmove", handleTouchMove, { passive: false });
@@ -245,6 +304,7 @@ export function useHeroScrollScrub({ videoRef }) {
     return () => {
       disposed = true;
       window.clearTimeout(failureTimerId);
+      clearSeekWatchdog();
       window.cancelAnimationFrame(animationFrameId);
       if (videoFrameId !== null && "cancelVideoFrameCallback" in video) {
         video.cancelVideoFrameCallback(videoFrameId);
@@ -253,6 +313,13 @@ export function useHeroScrollScrub({ videoRef }) {
       video.removeEventListener("loadeddata", handleReady);
       video.removeEventListener("canplay", handleReady);
       video.removeEventListener("seeked", handleSeeked);
+      video.removeEventListener("stalled", handleMediaFailure);
+      video.removeEventListener("abort", handleMediaFailure);
+      video.removeEventListener("error", handleMediaFailure);
+      reducedMotionQuery.removeEventListener(
+        "change",
+        handleReducedMotionChange,
+      );
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);

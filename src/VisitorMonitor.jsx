@@ -262,7 +262,9 @@ export function VisitorMonitorView({
 }
 
 export function VisitorMonitor() {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(
+    () => !window.matchMedia("(max-width: 760px)").matches,
+  );
   const [selectedSessionId, setSelectedSessionId] = useState(null);
   const monitor = useVisitorMonitor();
 
