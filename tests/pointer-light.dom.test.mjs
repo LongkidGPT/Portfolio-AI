@@ -138,6 +138,7 @@ test("pointer light is decorative and cannot intercept clicks", async () => {
     assert.equal(light.getAttribute("aria-hidden"), "true");
     assert.equal(light.getAttribute("alt"), "");
     assert.equal(light.className, "pointer-light");
+    assert.equal(light.getAttribute("src"), "/assets/pointer-light-02.png");
   } finally {
     await cleanup(root, environment);
   }

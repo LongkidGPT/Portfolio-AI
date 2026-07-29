@@ -110,7 +110,7 @@ export function PointerLight() {
     <img
       ref={lightRef}
       className="pointer-light"
-      src="/assets/hero-light-spot.png"
+      src="/assets/pointer-light-02.png"
       alt=""
       aria-hidden="true"
       style={{

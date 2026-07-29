@@ -10,7 +10,7 @@ const { projects } = portfolioData;
 const homepageImages = [
   "/public/assets/hero-first-frame.webp",
   "/public/assets/hero-poster.webp",
-  "/public/assets/hero-light-spot.png",
+  "/public/assets/pointer-light-02.png",
   "/public/assets/contact-bg.webp",
   ...projects.flatMap(({ defaultImage, hoverImage }) => [
     `/public${defaultImage}`,
