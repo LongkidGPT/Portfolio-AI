@@ -38,12 +38,26 @@
 - 现有全页面跟随、速度响应、隐藏逻辑与 `pointer-events: none` 保持不变。
 - 继续在触控设备和减少动态效果模式下隐藏。
 
+## 英文字体系统
+
+- 自托管 Geist Mono 可变字体，不依赖运行时外链字体服务。
+- 页面中的拉丁字符优先使用 Geist Mono；中文字符继续回退到现有中文字体。
+- 页面级英文标题使用 Geist Mono Thin（`font-weight: 100`），并统一为英文标题式大小写：
+  - `Design for Business` / `Momentum`
+  - `How I Move Design Forward`
+  - `Proof Through Projects`
+  - `Across Brand, Product and Market`
+  - `Let's Talk`
+- 导航、按钮、卡片、经历及一般内容使用 Geist Mono ExtraLight（`font-weight: 200`）。
+- 章节分隔标签 `01 APPROACH`、`02 SELECTED WORK`、`03 EXPERIENCE` 使用 Geist Mono Regular（`font-weight: 400`），并保持全大写。
+- 右下角 `LIVE SIGNAL` 面板统一 Geist Mono 字体家族，但保留现有 Regular/Medium 字重层级，以维持小字号数据界面的可读性。
+
 ## 标题打字动画
 
 ### 时序
 
 1. Hero 进入 `revealed` 阶段，最终定帧开始显示。
-2. 主标题改为全大写，按原换行逐字出现：第一行 `DESIGN FOR BUSINESS`，第二行 `MOMENTUM`。
+2. 主标题按原换行逐字出现：第一行 `Design for Business`，第二行 `Momentum`。
 3. 最后一个字符出现后，光标继续闪烁约 `1000ms`。
 4. 光标消失。
 5. 副标题、主按钮、微信按钮沿用当前顺序依次淡入。
@@ -59,6 +73,7 @@
 ## 验证
 
 - 自动测试覆盖：Cycle 关闭时不挂载视频、标题结构和时序类名、案例图片使用自然尺寸流。
+- 字体测试覆盖：自托管字体声明存在；页面标题、一般内容、章节标签与 `LIVE SIGNAL` 使用约定字重。
 - 浏览器验证覆盖：
   - 桌面弹窗宽度为 `860px`。
   - `390px` 手机视口下弹窗与图片同宽且无横向滚动。
