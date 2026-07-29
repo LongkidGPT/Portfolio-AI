@@ -133,6 +133,28 @@ a:focus-visible {
   touch-action: pan-y;
 }
 
+.pointer-light {
+  position: fixed;
+  z-index: 30;
+  top: var(--pointer-y);
+  left: var(--pointer-x);
+  width: clamp(130px, 13vw, 220px);
+  max-width: none;
+  aspect-ratio: 1;
+  opacity: var(--pointer-opacity);
+  transform:
+    translate(-50%, -50%)
+    scale(var(--pointer-scale));
+  filter: drop-shadow(0 0 22px rgba(62, 225, 231, 0.2));
+  mix-blend-mode: screen;
+  pointer-events: none;
+  will-change: top, left, transform, opacity;
+}
+
+.pointer-light.is-unavailable {
+  display: none;
+}
+
 .hero__scrim {
   position: absolute;
   z-index: 4;
@@ -1320,6 +1342,10 @@ a:focus-visible {
 }
 
 @media (hover: none), (pointer: coarse) {
+  .pointer-light {
+    display: none;
+  }
+
   .project-card__image--default {
     opacity: 0;
   }
@@ -1603,6 +1629,10 @@ a:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .pointer-light {
+    display: none;
   }
 
   *,

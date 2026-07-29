@@ -5,6 +5,7 @@ import { CaseStudyModal } from "./CaseStudyModal.jsx";
 import { CopyButton } from "./CopyButton.jsx";
 import { ExperienceSection } from "./ExperienceSection.jsx";
 import { HeroSection } from "./HeroSection.jsx";
+import { PointerLight } from "./PointerLight.jsx";
 import { ProjectCard } from "./ProjectCard.jsx";
 import { VisitorMonitor } from "./VisitorMonitor.jsx";
 
@@ -32,6 +33,7 @@ export function App() {
 
   return (
     <>
+      <PointerLight />
       <div ref={backgroundRef}>
         <HeroSection />
 
