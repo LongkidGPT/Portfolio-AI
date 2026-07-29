@@ -462,6 +462,11 @@ test("mounted Hero content is inert while hidden and interactive after release",
     });
 
     const content = document.querySelector(".hero__content");
+    assert.equal(
+      document.querySelector(".hero__cycle-scene"),
+      null,
+      "disabled spatial view must not mount or request the cycle video",
+    );
     assert.ok(content.hasAttribute("inert"));
     assert.equal(content.getAttribute("aria-hidden"), "true");
     assert.equal(getComputedStyle(content).pointerEvents, "none");

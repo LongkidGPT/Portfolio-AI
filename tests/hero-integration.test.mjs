@@ -2,11 +2,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("HeroSection uses the intro stage and a settled spatial-view layer", async () => {
-  const source = await readFile(
-    new URL("../src/HeroSection.jsx", import.meta.url),
-    "utf8",
-  );
+test("HeroSection keeps the spatial-view integration behind a disabled feature flag", async () => {
+  const [source, features] = await Promise.all([
+    readFile(new URL("../src/HeroSection.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/hero-features.js", import.meta.url), "utf8"),
+  ]);
 
   assert.match(source, /className="hero__stage"/);
   assert.match(source, /className="hero__video"/);
@@ -15,6 +15,8 @@ test("HeroSection uses the intro stage and a settled spatial-view layer", async 
   assert.match(source, /\/assets\/hero-first-frame\.webp/);
   assert.match(source, /\/assets\/hero-cycle-front\.mp4/);
   assert.match(source, /useCycleSpatialView/);
+  assert.match(source, /heroFeatures\.cycleSpatialView/);
+  assert.match(features, /cycleSpatialView:\s*false/);
   assert.doesNotMatch(source, /hero__distortion/);
   assert.doesNotMatch(source, /\.play\(/);
 });

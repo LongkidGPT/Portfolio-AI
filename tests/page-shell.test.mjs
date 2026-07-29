@@ -41,8 +41,8 @@ test("Experience section exposes the editorial career structure", async () => {
   assert.match(experienceSection, /className="experience__intro"/);
   assert.match(experienceSection, /className="experience-list"/);
   assert.match(experienceSection, /className="experience-row"/);
-  assert.match(experienceSection, /ACROSS BRAND,/);
-  assert.match(experienceSection, /PRODUCT AND MARKET/);
+  assert.match(experienceSection, /Across Brand,/);
+  assert.match(experienceSection, /Product and Market/);
   assert.match(experienceSection, /data-track-label="EXPERIENCE"/);
   assert.doesNotMatch(
     css,
@@ -59,7 +59,8 @@ test("hero uses the supplied video and poster assets", async () => {
   assert.match(hero, /\/assets\/hero-bg-optimized\.mp4/);
   assert.match(hero, /\/assets\/hero-first-frame\.webp/);
   assert.match(hero, /\/assets\/hero-poster\.webp/);
-  assert.match(hero, /className=\{`hero hero--\$\{heroState\}`\}/);
+  assert.match(hero, /className=\{`hero hero--\$\{heroState\}\$\{/);
+  assert.match(hero, /hero--type-complete/);
   assert.match(hero, /useHeroScrollScrub\(\{ videoRef \}\)/);
   assert.match(hero, /muted/);
   assert.match(hero, /playsInline/);
@@ -403,7 +404,8 @@ test("Hero CSS layers the settled spatial view and reveals content in order", as
   assert.match(css, /\.hero__final-scene\s*\{[\s\S]*?1050ms/);
   assert.match(css, /\.hero__cycle-scene\s*\{[\s\S]*?opacity:\s*0/);
   assert.match(css, /\.hero--revealed \.hero__cycle-scene/);
-  assert.match(css, /@keyframes hero-title-in/);
+  assert.match(css, /\.hero-typewriter__cursor/);
+  assert.match(css, /@keyframes hero-cursor-blink/);
   assert.match(css, /@keyframes hero-subtitle-in/);
   assert.match(css, /@keyframes hero-primary-in/);
   assert.match(css, /@keyframes hero-wechat-in/);

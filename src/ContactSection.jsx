@@ -9,7 +9,7 @@ export function ContactSection() {
       data-track-label="LET’S TALK"
     >
       <div className="contact__content">
-        <h2>LET&apos;S TALK</h2>
+        <h2>Let&apos;s Talk</h2>
         <p className="contact__details">
           <a href="mailto:long.kidq@gmail.com">
             E-mail：long.kidq@gmail.com

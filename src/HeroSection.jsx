@@ -1,7 +1,9 @@
 import { ArrowDown } from "@phosphor-icons/react";
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { CopyButton } from "./CopyButton.jsx";
+import { heroFeatures } from "./hero-features.js";
+import { HeroTypewriter } from "./HeroTypewriter.jsx";
 import { useCycleSpatialView } from "./use-cycle-spatial-view.js";
 import { useHeroScrollScrub } from "./use-hero-scroll-scrub.js";
 
@@ -9,6 +11,8 @@ export function HeroSection() {
   const heroRef = useRef(null);
   const videoRef = useRef(null);
   const cycleVideoRef = useRef(null);
+  const [typewriterComplete, setTypewriterComplete] = useState(false);
+  const cycleEnabled = heroFeatures.cycleSpatialView;
   const {
     heroState,
     completeReveal,
@@ -18,8 +22,13 @@ export function HeroSection() {
   useCycleSpatialView({
     heroRef,
     videoRef: cycleVideoRef,
-    active: ["revealed", "released"].includes(heroState),
+    active:
+      cycleEnabled && ["revealed", "released"].includes(heroState),
   });
+  const completeTypewriter = useCallback(
+    () => setTypewriterComplete(true),
+    [],
+  );
 
   const handleHeroNavigation = (event) => {
     const anchor = event.target.closest("a[href^='#']");
@@ -47,7 +56,9 @@ export function HeroSection() {
   return (
     <section
       ref={heroRef}
-      className={`hero hero--${heroState}`}
+      className={`hero hero--${heroState}${
+        typewriterComplete ? " hero--type-complete" : ""
+      }`}
       id="hero"
       data-track-section
       data-track-label="HERO"
@@ -74,19 +85,21 @@ export function HeroSection() {
             heroRef.current?.classList.add("hero--poster-failed")
           }
         />
-        <video
-          ref={cycleVideoRef}
-          className="hero__cycle-scene"
-          src="/assets/hero-cycle-front.mp4"
-          poster="/assets/hero-poster.webp"
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-          onError={() =>
-            heroRef.current?.classList.add("hero--cycle-failed")
-          }
-        />
+        {cycleEnabled && (
+          <video
+            ref={cycleVideoRef}
+            className="hero__cycle-scene"
+            src="/assets/hero-cycle-front.mp4"
+            poster="/assets/hero-poster.webp"
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+            onError={() =>
+              heroRef.current?.classList.add("hero--cycle-failed")
+            }
+          />
+        )}
       </div>
       <div className="hero__scrim" aria-hidden="true" />
 
@@ -113,11 +126,12 @@ export function HeroSection() {
         inert={contentIsHidden ? true : undefined}
         aria-hidden={contentIsHidden ? true : undefined}
       >
-        <h1>
-          Design for Business
-          <br />
-          Momentum
-        </h1>
+        <HeroTypewriter
+          active={["resolving", "revealed", "released"].includes(
+            heroState,
+          )}
+          onComplete={completeTypewriter}
+        />
         <p>以视觉系统、上市传播与用户体验，推动品牌认知与业务转化</p>
         <div className="hero__actions" onClick={handleHeroNavigation}>
           <a className="button button--light" href="#work">

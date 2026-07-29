@@ -280,20 +280,21 @@ a:focus-visible {
   transform: translateY(16px);
 }
 
-.hero--resolving .hero__content h1 {
-  animation: hero-title-in 550ms 760ms cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
+.hero--resolving .hero-typewriter {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.hero--resolving .hero__content > p {
-  animation: hero-subtitle-in 520ms 940ms cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
+.hero--type-complete.hero--resolving .hero__content > p {
+  animation: hero-subtitle-in 520ms cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
 }
 
-.hero--resolving .hero__actions > :first-child {
-  animation: hero-primary-in 500ms 1120ms cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
+.hero--type-complete.hero--resolving .hero__actions > :first-child {
+  animation: hero-primary-in 500ms 160ms cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
 }
 
-.hero--resolving .hero__actions > :last-child {
-  animation: hero-wechat-in 500ms 1260ms cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
+.hero--type-complete.hero--resolving .hero__actions > :last-child {
+  animation: hero-wechat-in 500ms 320ms cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
 }
 
 .hero--revealed .hero__content h1,
@@ -307,11 +308,43 @@ a:focus-visible {
 }
 
 .hero__content h1 {
+  position: relative;
   margin: 0;
   font-size: clamp(48px, 4.35vw, 76px);
   font-weight: 250;
   line-height: 1.08;
   letter-spacing: -0.035em;
+}
+
+.hero-typewriter__ghost,
+.hero-typewriter__typed {
+  display: grid;
+  justify-items: center;
+}
+
+.hero-typewriter__ghost {
+  visibility: hidden;
+}
+
+.hero-typewriter__typed {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-typewriter__ghost > span,
+.hero-typewriter__typed > span {
+  display: block;
+  min-height: 1.08em;
+}
+
+.hero-typewriter__cursor {
+  display: inline-block;
+  width: 0.08em;
+  height: 0.86em;
+  margin-left: 0.08em;
+  background: currentColor;
+  animation: hero-cursor-blink 620ms steps(1, end) infinite;
+  vertical-align: -0.06em;
 }
 
 .hero__content > p {
@@ -1333,10 +1366,9 @@ a:focus-visible {
   }
 }
 
-@keyframes hero-title-in {
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@keyframes hero-cursor-blink {
+  50% {
+    opacity: 0;
   }
 }
 
