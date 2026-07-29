@@ -76,6 +76,28 @@ test("marketing source is never upscaled", () => {
   assert.equal(plan.outputHeight, 32768);
 });
 
+test("system plan removes the asymmetric right-side source canvas", () => {
+  const plan = buildCaseStudyPlan(
+    {
+      id: "system",
+      filename: "系统架构-案例.png",
+      width: 3215,
+      height: 32768,
+      cropWidth: 3034,
+      assetVersion: "crop-3034",
+    },
+    { maxWidth: 1720, maxSliceHeight: 4096, quality: 82 },
+  );
+
+  assert.equal(plan.outputWidth, 1720);
+  assert.equal(plan.outputHeight, 18576);
+  assert.equal(plan.slices.at(-1).height, 2192);
+  assert.equal(
+    plan.slices[0].src,
+    "/assets/cases/system/slice-01.webp?v=crop-3034",
+  );
+});
+
 test("manifest contains ordered public paths and reserved dimensions", () => {
   const plan = buildCaseStudyPlan(
     { id: "system", filename: "系统架构-案例.png", width: 3215, height: 32768 },
@@ -106,6 +128,29 @@ test("converter crops the exact source range and resizes to the planned slice", 
       "-q", "82", "-metadata", "none", "-crop", "0", "0", "2656", "6325",
       "-resize", "1720", "4096", "-o", "/outputs/slice-01.webp", "/sources/brand.png",
     ],
+  );
+});
+
+test("system converter excludes the detected right-side black canvas", () => {
+  const plan = buildCaseStudyPlan(
+    {
+      id: "system",
+      filename: "系统架构-案例.png",
+      width: 3215,
+      height: 32768,
+      cropWidth: 3034,
+    },
+    { maxWidth: 1720, maxSliceHeight: 4096, quality: 82 },
+  );
+
+  assert.deepEqual(
+    buildCwebpArgs({
+      sourcePath: "/sources/system.png",
+      sourceWidth: plan.cropWidth,
+      outputPath: "/outputs/slice-01.webp",
+      slice: plan.slices[0],
+    }).slice(4, 10),
+    ["-crop", "0", "0", "3034", "7225", "-resize"],
   );
 });
 
@@ -231,9 +276,25 @@ test("an explicitly supplied source root still completes conversion", async (t) 
   });
 
   const manifest = await readFile(manifestPath, "utf8");
+  const manifestData = JSON.parse(
+    manifest
+      .replace(/^export const caseStudies = /, "")
+      .replace(/;\s*$/, ""),
+  );
   assert.match(manifest, /"brand"/);
   assert.match(manifest, /"marketing"/);
   assert.match(manifest, /"system"/);
+  assert.equal(
+    manifestData.system.slices.reduce(
+      (height, slice) => height + slice.height,
+      0,
+    ),
+    18576,
+  );
+  assert.equal(
+    manifestData.system.slices[0].src,
+    "/assets/cases/system/slice-01.webp?v=crop-3034",
+  );
   assert.equal(
     await readFile(join(outputRoot, "brand", "slice-01.webp"), "utf8"),
     "fake-webp",

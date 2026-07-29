@@ -20,7 +20,14 @@ const defaultManifestPath = resolve(
 const sources = [
   { id: "brand", filename: "品牌系统-案例.png", width: 2656, height: 32768 },
   { id: "marketing", filename: "营销全案-案例.png", width: 1630, height: 32768 },
-  { id: "system", filename: "系统架构-案例.png", width: 3215, height: 32768 },
+  {
+    id: "system",
+    filename: "系统架构-案例.png",
+    width: 3215,
+    height: 32768,
+    cropWidth: 3034,
+    assetVersion: "crop-3034",
+  },
 ];
 
 export function readPngDimensions(filePath) {
@@ -114,7 +121,7 @@ export async function convertPlan(
       cwebpCommand,
       buildCwebpArgs({
         sourcePath,
-        sourceWidth: plan.width,
+        sourceWidth: plan.cropWidth ?? plan.width,
         outputPath,
         slice,
       }),

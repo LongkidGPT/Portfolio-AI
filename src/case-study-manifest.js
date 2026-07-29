@@ -83,29 +83,29 @@ export const caseStudies = {
     "id": "system",
     "slices": [
       {
-        "src": "/assets/cases/system/slice-01.webp",
+        "src": "/assets/cases/system/slice-01.webp?v=crop-3034",
         "width": 1720,
         "height": 4096
       },
       {
-        "src": "/assets/cases/system/slice-02.webp",
+        "src": "/assets/cases/system/slice-02.webp?v=crop-3034",
         "width": 1720,
         "height": 4096
       },
       {
-        "src": "/assets/cases/system/slice-03.webp",
+        "src": "/assets/cases/system/slice-03.webp?v=crop-3034",
         "width": 1720,
         "height": 4096
       },
       {
-        "src": "/assets/cases/system/slice-04.webp",
+        "src": "/assets/cases/system/slice-04.webp?v=crop-3034",
         "width": 1720,
         "height": 4096
       },
       {
-        "src": "/assets/cases/system/slice-05.webp",
+        "src": "/assets/cases/system/slice-05.webp?v=crop-3034",
         "width": 1720,
-        "height": 1147
+        "height": 2192
       }
     ]
   }
