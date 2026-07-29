@@ -1,157 +1,25 @@
 import { ArrowDown } from "@phosphor-icons/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import { CopyButton } from "./CopyButton.jsx";
-import {
-  normalizeHeroPointer,
-  resolveHeroParallax,
-  resolvePointerLight,
-} from "./hero-parallax.js";
+import { useCycleSpatialView } from "./use-cycle-spatial-view.js";
 import { useHeroScrollScrub } from "./use-hero-scroll-scrub.js";
-
-const NEUTRAL_POINTER = {
-  x: 0,
-  y: 0,
-  percentX: 50,
-  percentY: 50,
-  lightScale: 0.96,
-  lightOpacity: 0,
-};
 
 export function HeroSection() {
   const heroRef = useRef(null);
   const videoRef = useRef(null);
+  const cycleVideoRef = useRef(null);
   const {
     heroState,
     completeReveal,
     failMedia,
     releaseHero,
   } = useHeroScrollScrub({ videoRef });
-  const pointerTargetRef = useRef({ ...NEUTRAL_POINTER });
-  const pointerCurrentRef = useRef({ ...pointerTargetRef.current });
-  const pointerEnabledRef = useRef(false);
-  const previousPointerRef = useRef(null);
-
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return undefined;
-
-    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
-    const compactViewportQuery = window.matchMedia("(max-width: 760px)");
-    let frameId = 0;
-
-    const resetPointer = () => {
-      pointerTargetRef.current = { ...NEUTRAL_POINTER };
-      pointerCurrentRef.current = { ...NEUTRAL_POINTER };
-      previousPointerRef.current = null;
-      hero.style.setProperty("--stage-x", "0px");
-      hero.style.setProperty("--stage-y", "0px");
-      hero.style.setProperty("--stage-rx", "0deg");
-      hero.style.setProperty("--stage-ry", "0deg");
-      hero.style.setProperty("--stage-scale", 1.04);
-      hero.style.setProperty("--light-x", "50%");
-      hero.style.setProperty("--light-y", "50%");
-      hero.style.setProperty("--light-scale", 0.96);
-      hero.style.setProperty("--light-opacity", 0);
-    };
-
-    const renderPointer = () => {
-      frameId = 0;
-      if (!pointerEnabledRef.current) return;
-
-      const current = pointerCurrentRef.current;
-      const target = pointerTargetRef.current;
-
-      for (const key of Object.keys(current)) {
-        current[key] += (target[key] - current[key]) * 0.14;
-      }
-
-      const transform = resolveHeroParallax(current);
-      hero.style.setProperty("--stage-x", `${transform.translateX}px`);
-      hero.style.setProperty("--stage-y", `${transform.translateY}px`);
-      hero.style.setProperty("--stage-rx", `${transform.rotateX}deg`);
-      hero.style.setProperty("--stage-ry", `${transform.rotateY}deg`);
-      hero.style.setProperty("--stage-scale", transform.scale);
-      hero.style.setProperty("--light-x", `${current.percentX}%`);
-      hero.style.setProperty("--light-y", `${current.percentY}%`);
-      hero.style.setProperty("--light-scale", current.lightScale);
-      hero.style.setProperty("--light-opacity", current.lightOpacity);
-      frameId = window.requestAnimationFrame(renderPointer);
-    };
-
-    const handlePointerModeChange = () => {
-      const enabled =
-        !coarsePointerQuery.matches && !compactViewportQuery.matches;
-      pointerEnabledRef.current = enabled;
-
-      if (!enabled) {
-        if (frameId !== 0) {
-          window.cancelAnimationFrame(frameId);
-          frameId = 0;
-        }
-        resetPointer();
-        return;
-      }
-
-      if (frameId === 0) {
-        frameId = window.requestAnimationFrame(renderPointer);
-      }
-    };
-
-    coarsePointerQuery.addEventListener("change", handlePointerModeChange);
-    compactViewportQuery.addEventListener("change", handlePointerModeChange);
-    handlePointerModeChange();
-
-    return () => {
-      pointerEnabledRef.current = false;
-      if (frameId !== 0) {
-        window.cancelAnimationFrame(frameId);
-      }
-      coarsePointerQuery.removeEventListener("change", handlePointerModeChange);
-      compactViewportQuery.removeEventListener(
-        "change",
-        handlePointerModeChange,
-      );
-    };
-  }, []);
-
-  const handlePointerMove = (event) => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    if (!pointerEnabledRef.current) return;
-
-    const normalized = normalizeHeroPointer(
-      event,
-      hero.getBoundingClientRect(),
-    );
-    const now = performance.now();
-    const previous = previousPointerRef.current ?? {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      time: now,
-    };
-    const light = resolvePointerLight(
-      previous,
-      event,
-      now - previous.time,
-    );
-
-    pointerTargetRef.current = {
-      ...normalized,
-      lightScale: light.scale,
-      lightOpacity: light.opacity,
-    };
-    previousPointerRef.current = {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      time: now,
-    };
-  };
-
-  const handlePointerLeave = () => {
-    pointerTargetRef.current = { ...NEUTRAL_POINTER };
-    previousPointerRef.current = null;
-  };
+  useCycleSpatialView({
+    heroRef,
+    videoRef: cycleVideoRef,
+    active: ["revealed", "released"].includes(heroState),
+  });
 
   const handleHeroNavigation = (event) => {
     const anchor = event.target.closest("a[href^='#']");
@@ -183,8 +51,6 @@ export function HeroSection() {
       id="hero"
       data-track-section
       data-track-label="HERO"
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
     >
       <div className="hero__stage" aria-hidden="true">
         <video
@@ -208,16 +74,20 @@ export function HeroSection() {
             heroRef.current?.classList.add("hero--poster-failed")
           }
         />
+        <video
+          ref={cycleVideoRef}
+          className="hero__cycle-scene"
+          src="/assets/hero-cycle-front.mp4"
+          poster="/assets/hero-poster.webp"
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          onError={() =>
+            heroRef.current?.classList.add("hero--cycle-failed")
+          }
+        />
       </div>
-      <img
-        className="hero__pointer-light"
-        src="/assets/hero-light-spot.png"
-        alt=""
-        aria-hidden="true"
-        onError={(event) =>
-          event.currentTarget.classList.add("is-unavailable")
-        }
-      />
       <div className="hero__scrim" aria-hidden="true" />
 
       <nav
