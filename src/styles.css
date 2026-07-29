@@ -1,9 +1,19 @@
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/assets/fonts/geist-mono-variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 :root {
   color: #f1f4f4;
   background: #000;
-  font-family:
-    "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-    Arial, sans-serif;
+  --font-mono: "Geist Mono";
+  --font-cjk:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-weight: 200;
   font-synthesis: none;
   --shell: min(78vw, 1180px);
   --line: rgba(224, 234, 234, 0.16);
@@ -182,7 +192,7 @@ a:focus-visible {
   border-radius: 999px;
   background: rgba(0, 7, 8, 0.25);
   backdrop-filter: blur(10px);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 12px;
   isolation: isolate;
   letter-spacing: 0.02em;
@@ -212,7 +222,7 @@ a:focus-visible {
 }
 
 .top-nav__brand {
-  font-weight: 650;
+  font-weight: 200;
   letter-spacing: 0.04em;
 }
 
@@ -311,7 +321,7 @@ a:focus-visible {
   position: relative;
   margin: 0;
   font-size: clamp(48px, 4.35vw, 76px);
-  font-weight: 250;
+  font-weight: 100;
   line-height: 1.08;
   letter-spacing: -0.035em;
 }
@@ -351,7 +361,7 @@ a:focus-visible {
   margin: var(--heading-support-gap) 0 0;
   color: rgba(240, 245, 245, 0.72);
   font-size: clamp(15px, 1.18vw, 20px);
-  font-weight: 320;
+  font-weight: 200;
   letter-spacing: 0.025em;
 }
 
@@ -371,7 +381,7 @@ a:focus-visible {
   gap: 9px;
   padding: 0 28px;
   border-radius: 999px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 12px;
   letter-spacing: 0.01em;
   transition:
@@ -401,7 +411,7 @@ a:focus-visible {
   background: rgba(0, 9, 10, 0.18);
   color: rgba(230, 237, 237, 0.42);
   backdrop-filter: blur(8px);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 12px;
 }
 
@@ -470,7 +480,7 @@ a:focus-visible {
   background: rgba(0, 0, 0, 0.78);
   color: #fff;
   cursor: pointer;
-  font: 12px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font: 200 12px/1 var(--font-mono), var(--font-cjk), monospace;
 }
 
 .case-study__loading,
@@ -479,7 +489,7 @@ a:focus-visible {
   place-items: center;
   min-height: 64px;
   color: rgba(245, 248, 248, 0.72);
-  font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font: 200 12px/1.5 var(--font-mono), var(--font-cjk), monospace;
 }
 
 .case-study__loading {
@@ -543,8 +553,9 @@ a:focus-visible {
   gap: 18px;
   margin: 0;
   color: rgba(223, 231, 231, 0.36);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 11px;
+  font-weight: 400;
   letter-spacing: 0.08em;
 }
 
@@ -569,7 +580,7 @@ a:focus-visible {
 .contact h2 {
   margin: 0;
   font-size: clamp(40px, 3.25vw, 56px);
-  font-weight: 220;
+  font-weight: 100;
   line-height: 1.02;
   letter-spacing: -0.035em;
 }
@@ -605,7 +616,7 @@ a:focus-visible {
 
 .principles__number {
   color: rgba(226, 233, 233, 0.28);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 12px;
 }
 
@@ -616,7 +627,7 @@ a:focus-visible {
 
 .principles__copy strong {
   font-size: 19px;
-  font-weight: 420;
+  font-weight: 200;
 }
 
 .principles__copy span {
@@ -741,7 +752,7 @@ a:focus-visible {
 
 .project-card__copy strong {
   font-size: clamp(14px, 1.15vw, 20px);
-  font-weight: 430;
+  font-weight: 200;
 }
 
 .project-card__copy > span {
@@ -754,7 +765,7 @@ a:focus-visible {
 
 .project-card:not(.project-card--wide) .project-card__copy strong {
   font-size: clamp(16px, 1.2vw, 22px);
-  font-weight: 400;
+  font-weight: 200;
 }
 
 .project-card:not(.project-card--wide) .project-card__copy {
@@ -803,7 +814,7 @@ a:focus-visible {
 .experience__intro h3 {
   margin: 42px 0 0;
   font-size: clamp(17px, 1.35vw, 23px);
-  font-weight: 400;
+  font-weight: 200;
 }
 
 .experience__intro p {
@@ -880,7 +891,7 @@ a:focus-visible {
   margin: var(--heading-support-gap) 0 0;
   color: rgba(233, 239, 239, 0.6);
   font-size: clamp(13px, 1.08vw, 18px);
-  font-weight: 300;
+  font-weight: 200;
 }
 
 .top-nav__brand,
@@ -963,8 +974,9 @@ a:focus-visible {
     inset 0 1px rgba(255, 255, 255, 0.035);
   color: rgba(235, 244, 244, 0.88);
   backdrop-filter: blur(22px);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 10px;
+  font-weight: 400;
   letter-spacing: 0.055em;
 }
 

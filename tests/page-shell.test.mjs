@@ -174,7 +174,7 @@ test("desktop project cards preserve the supplied framed artwork proportions", a
       desktop,
       ".project-card:not(.project-card--wide) .project-card__copy strong",
     ),
-    /font-size:\s*clamp\(16px,\s*1\.2vw,\s*22px\)[\s\S]*font-weight:\s*400/,
+    /font-size:\s*clamp\(16px,\s*1\.2vw,\s*22px\)[\s\S]*font-weight:\s*200/,
   );
   assert.match(
     cssDeclarations(
@@ -427,4 +427,54 @@ test("Experience company names carry the primary white hierarchy", async () => {
     css,
     /\.experience-row span:first-child\s*\{[\s\S]*?color:\s*#fff/,
   );
+});
+
+test("page typography uses the self-hosted Geist Mono hierarchy", async () => {
+  const [app, css] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
+  ]);
+  const desktop = baseCss(css);
+
+  assert.match(
+    css,
+    /@font-face\s*\{[\s\S]*?font-family:\s*"Geist Mono"[\s\S]*?geist-mono-variable\.woff2[\s\S]*?font-weight:\s*100 900/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ":root"),
+    /--font-mono:\s*"Geist Mono"/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ":root"),
+    /font-family:\s*var\(--font-mono\),\s*var\(--font-cjk\),\s*monospace/,
+  );
+  assert.match(cssDeclarations(desktop, ":root"), /font-weight:\s*200/);
+  assert.match(
+    cssDeclarations(desktop, ".approach__intro h2"),
+    /font-weight:\s*100/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".hero__content h1"),
+    /font-weight:\s*100/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".section-label"),
+    /font-weight:\s*400/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".visitor-monitor"),
+    /font-family:\s*var\(--font-mono\),\s*var\(--font-cjk\),\s*monospace/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".visitor-monitor"),
+    /font-weight:\s*400/,
+  );
+
+  for (const title of [
+    "How I Move",
+    "Design Forward",
+    "Proof Through Projects",
+  ]) {
+    assert.match(app, new RegExp(title));
+  }
 });

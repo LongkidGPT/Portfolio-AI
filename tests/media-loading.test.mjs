@@ -12,6 +12,7 @@ const homepageImages = [
   "/public/assets/hero-poster.webp",
   "/public/assets/pointer-light-02.png",
   "/public/assets/contact-bg.webp",
+  "/public/assets/fonts/geist-mono-variable.woff2",
   ...projects.flatMap(({ defaultImage, hoverImage }) => [
     `/public${defaultImage}`,
     `/public${hoverImage}`,
