@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const titleLines = ["Design for Business", "Momentum"];
 const titleLength = titleLines.reduce((total, line) => total + line.length, 0);
-const typeDelay = 60;
+const typeDelay = 30;
 const cursorHoldDelay = 1000;
 
 export function HeroTypewriter({ active, onComplete }) {

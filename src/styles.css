@@ -17,7 +17,7 @@
   font-synthesis: none;
   --shell: min(78vw, 1180px);
   --line: rgba(224, 234, 234, 0.16);
-  --muted: rgba(220, 228, 228, 0.42);
+  --muted: rgba(220, 228, 228, 0.55);
   --soft: rgba(232, 238, 238, 0.66);
   --cyan: #47dde0;
   --heading-support-gap: 25.2px;
@@ -349,17 +349,17 @@ a:focus-visible {
 
 .hero-typewriter__cursor {
   display: inline-block;
-  width: 0.08em;
+  width: 0.24em;
   height: 0.86em;
   margin-left: 0.08em;
-  background: currentColor;
+  background: #2c9295;
   animation: hero-cursor-blink 620ms steps(1, end) infinite;
   vertical-align: -0.06em;
 }
 
 .hero__content > p {
   margin: var(--heading-support-gap) 0 0;
-  color: rgba(240, 245, 245, 0.72);
+  color: rgba(240, 245, 245, 0.65);
   font-size: clamp(15px, 1.18vw, 20px);
   font-weight: 200;
   letter-spacing: 0.025em;
@@ -757,7 +757,7 @@ a:focus-visible {
 
 .project-card__copy > span {
   max-width: 660px;
-  color: rgba(232, 239, 239, 0.48);
+  color: rgba(232, 239, 239, 0.55);
   font-size: clamp(10px, 0.74vw, 13px);
   line-height: 1.75;
   overflow-wrap: break-word;
@@ -889,7 +889,7 @@ a:focus-visible {
   gap: 24px;
   justify-content: center;
   margin: var(--heading-support-gap) 0 0;
-  color: rgba(233, 239, 239, 0.6);
+  color: rgba(233, 239, 239, 0.65);
   font-size: clamp(13px, 1.08vw, 18px);
   font-weight: 200;
 }

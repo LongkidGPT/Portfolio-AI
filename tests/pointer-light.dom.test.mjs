@@ -25,9 +25,13 @@ test.after(async () => {
   await vite?.close();
 });
 
-function installDom({ coarse = false, reducedMotion = false } = {}) {
+function installDom({
+  coarse = false,
+  reducedMotion = false,
+  heroState = "revealed",
+} = {}) {
   const dom = new JSDOM(
-    "<!doctype html><html><body><div id=\"root\"></div></body></html>",
+    `<!doctype html><html><body><section class="hero hero--${heroState}"></section><div id="root"></div></body></html>`,
     { url: "https://portfolio.test/" },
   );
   const previousGlobals = {};
@@ -124,6 +128,32 @@ test("pointer light follows viewport coordinates outside Hero", async () => {
     assert.notEqual(
       light.style.getPropertyValue("--pointer-opacity"),
       "0",
+    );
+  } finally {
+    await cleanup(root, environment);
+  }
+});
+
+test("pointer light waits for the Hero title and settles at eighty percent opacity", async () => {
+  const environment = installDom({ heroState: "ready" });
+  const { root, light } = await renderLight();
+
+  try {
+    dispatchPointer(320, 240);
+    for (let index = 0; index < 60; index += 1) {
+      environment.stepAnimationFrame();
+    }
+    assert.equal(light.style.getPropertyValue("--pointer-opacity"), "0");
+
+    document.querySelector(".hero").className = "hero hero--resolving";
+    await act(async () => Promise.resolve());
+    for (let index = 0; index < 60; index += 1) {
+      environment.stepAnimationFrame();
+    }
+    assert.ok(
+      Math.abs(
+        Number(light.style.getPropertyValue("--pointer-opacity")) - 0.8,
+      ) < 0.001,
     );
   } finally {
     await cleanup(root, environment);

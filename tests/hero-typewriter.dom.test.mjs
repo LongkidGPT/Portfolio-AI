@@ -113,10 +113,10 @@ test("typewriter types both title lines then keeps the cursor for one second", a
       title.getAttribute("aria-label"),
       "Design for Business Momentum",
     );
-    assert.equal(environment.pending(60), 1);
+    assert.equal(environment.pending(30), 1);
 
     for (let index = 0; index < 27; index += 1) {
-      await environment.runNext(60);
+      await environment.runNext(30);
     }
 
     assert.match(
@@ -156,7 +156,7 @@ test("reduced motion exposes the complete title without typing timers", async ()
     assert.match(document.querySelector("h1").textContent, /Design for Business/);
     assert.match(document.querySelector("h1").textContent, /Momentum/);
     assert.equal(document.querySelector(".hero-typewriter__cursor"), null);
-    assert.equal(environment.pending(60), 0);
+    assert.equal(environment.pending(30), 0);
     assert.equal(completed, 1);
   } finally {
     await act(async () => root.unmount());

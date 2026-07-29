@@ -22,9 +22,18 @@ export function PointerLight() {
     );
     const target = { ...INITIAL_LIGHT };
     const current = { ...INITIAL_LIGHT };
+    const hero = document.querySelector(".hero");
     let previousPointer = null;
     let animationFrameId = 0;
     let enabled = false;
+    let titleEntered = Boolean(
+      hero?.matches(".hero--resolving, .hero--revealed, .hero--released"),
+    );
+
+    const updateVisibility = () => {
+      target.opacity =
+        enabled && titleEntered && previousPointer ? 0.8 : 0;
+    };
 
     const render = () => {
       for (const key of Object.keys(current)) {
@@ -60,12 +69,12 @@ export function PointerLight() {
       target.x = event.clientX;
       target.y = event.clientY;
       target.scale = response.scale;
-      target.opacity = response.opacity * 0.78;
       previousPointer = {
         clientX: event.clientX,
         clientY: event.clientY,
         time: now,
       };
+      updateVisibility();
     };
 
     const hideLight = () => {
@@ -77,11 +86,25 @@ export function PointerLight() {
       enabled =
         !coarsePointerQuery.matches && !reducedMotionQuery.matches;
       if (!enabled) {
-        target.opacity = 0;
         current.opacity = 0;
         light.style.setProperty("--pointer-opacity", 0);
       }
+      updateVisibility();
     };
+
+    const heroObserver = new window.MutationObserver(() => {
+      titleEntered = Boolean(
+        hero?.matches(".hero--resolving, .hero--revealed, .hero--released"),
+      );
+      updateVisibility();
+    });
+
+    if (hero) {
+      heroObserver.observe(hero, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
 
     coarsePointerQuery.addEventListener("change", updateMode);
     reducedMotionQuery.addEventListener("change", updateMode);
@@ -95,6 +118,7 @@ export function PointerLight() {
 
     return () => {
       window.cancelAnimationFrame(animationFrameId);
+      heroObserver.disconnect();
       coarsePointerQuery.removeEventListener("change", updateMode);
       reducedMotionQuery.removeEventListener("change", updateMode);
       window.removeEventListener("pointermove", handlePointerMove);

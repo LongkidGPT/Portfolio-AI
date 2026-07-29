@@ -478,3 +478,32 @@ test("page typography uses the self-hosted Geist Mono hierarchy", async () => {
     assert.match(app, new RegExp(title));
   }
 });
+
+test("support copy and Hero cursor use the revised visual hierarchy", async () => {
+  const css = await readFile(
+    new URL("../src/styles.css", import.meta.url),
+    "utf8",
+  );
+  const desktop = baseCss(css);
+
+  assert.match(
+    cssDeclarations(desktop, ":root"),
+    /--muted:\s*rgba\(220,\s*228,\s*228,\s*0\.55\)/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".project-card__copy > span"),
+    /color:\s*rgba\(232,\s*239,\s*239,\s*0\.55\)/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".hero__content > p"),
+    /color:\s*rgba\(240,\s*245,\s*245,\s*0\.65\)/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".contact__details"),
+    /color:\s*rgba\(233,\s*239,\s*239,\s*0\.65\)/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".hero-typewriter__cursor"),
+    /width:\s*0\.24em[\s\S]*background:\s*#2c9295/,
+  );
+});
