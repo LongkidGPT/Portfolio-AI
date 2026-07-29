@@ -130,7 +130,6 @@ export function CaseStudyModal({
             <div
               className="case-study__slice"
               key={slice.src}
-              style={{ aspectRatio: `${slice.width} / ${slice.height}` }}
             >
               {sliceState.error ? (
                 <button
@@ -143,9 +142,19 @@ export function CaseStudyModal({
               ) : (
                 <>
                   {index === 0 ? (
-                    <img {...imageProps} loading="eager" />
+                    <img
+                      {...imageProps}
+                      width={slice.width}
+                      height={slice.height}
+                      loading="eager"
+                    />
                   ) : (
-                    <img {...imageProps} loading="lazy" />
+                    <img
+                      {...imageProps}
+                      width={slice.width}
+                      height={slice.height}
+                      loading="lazy"
+                    />
                   )}
                 </>
               )}

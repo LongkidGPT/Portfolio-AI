@@ -296,7 +296,18 @@ test("zoom-stable CSS keeps tablet card copy and modal content in bounds", async
   assert.match(cssDeclarations(desktop, "body"), /overflow-x:\s*hidden/);
   assert.match(cssDeclarations(desktop, ".content-layer"), /overflow-x:\s*hidden/);
   assert.match(cssDeclarations(desktop, "img"), /max-width:\s*100%/);
-  assert.match(cssDeclarations(desktop, ".case-study__document"), /max-width:\s*100%/);
+  assert.match(
+    cssDeclarations(desktop, ".case-study"),
+    /overflow-x:\s*hidden/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".case-study__document"),
+    /width:\s*min\(860px,\s*calc\(100dvw - 24px\)\)/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".case-study__slice img"),
+    /width:\s*100%[\s\S]*height:\s*auto/,
+  );
   assert.match(cssDeclarations(desktop, ".project-card__copy"), /bottom:\s*\d+%/);
 
   for (const selector of [
@@ -375,11 +386,11 @@ test("case-study modal renders the required accessible document shell", async ()
   assert.match(modal, /loading="lazy"/);
   assert.match(modal, /aria-modal="true"/);
   assert.match(modal, /case-study__retry/);
-  assert.match(css, /\.case-study__document\s*\{[\s\S]*?width:\s*860px/);
   assert.match(
     css,
-    /@media \(max-width: 760px\)[\s\S]*?\.case-study__document\s*\{[\s\S]*?width:\s*calc\(100vw - 24px\)/,
+    /\.case-study__document\s*\{[\s\S]*?width:\s*min\(860px,\s*calc\(100dvw - 24px\)\)/,
   );
+  assert.doesNotMatch(modal, /style=\{\{\s*aspectRatio:/);
 });
 
 test("Hero CSS layers the settled spatial view and reveals content in order", async () => {

@@ -232,6 +232,22 @@ test("rendered modal traps Tab in its controls and retries a failed image with a
   }
 });
 
+test("rendered case slices reserve their real dimensions without forcing a second aspect-ratio box", async () => {
+  const harness = await renderHarness();
+
+  try {
+    await openCase(harness, "system");
+    const firstSlice = document.querySelector(".case-study__slice");
+    const firstImage = firstSlice.querySelector("img");
+
+    assert.equal(firstSlice.hasAttribute("style"), false);
+    assert.equal(firstImage.getAttribute("width"), "1720");
+    assert.equal(firstImage.getAttribute("height"), "4096");
+  } finally {
+    await harness.cleanup();
+  }
+});
+
 test("Escape and backdrop close the rendered modal while document clicks do not", async () => {
   let closeCount = 0;
   const harness = await renderHarness(() => {
