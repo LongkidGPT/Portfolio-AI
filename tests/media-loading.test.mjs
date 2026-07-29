@@ -7,6 +7,17 @@ import * as portfolioData from "../src/portfolio-data.js";
 const repoFile = (path) => new URL(`..${path}`, import.meta.url);
 const { projects } = portfolioData;
 
+function readLossyWebpDimensions(buffer) {
+  const frameSignature = Buffer.from([0x9d, 0x01, 0x2a]);
+  const frameOffset = buffer.indexOf(frameSignature);
+
+  assert.notEqual(frameOffset, -1, "expected a lossy WebP frame");
+  return {
+    width: buffer.readUInt16LE(frameOffset + 3) & 0x3fff,
+    height: buffer.readUInt16LE(frameOffset + 5) & 0x3fff,
+  };
+}
+
 const homepageImages = [
   "/public/assets/hero-first-frame.webp",
   "/public/assets/hero-poster.webp",
@@ -36,6 +47,17 @@ test("homepage media derivatives exist within delivery budgets", async () => {
     videoSize <= 6 * 1024 * 1024,
     `hero video is ${(videoSize / 1024 / 1024).toFixed(2)} MiB`,
   );
+});
+
+test("Hero poster preserves enough source resolution for Retina displays", async () => {
+  const poster = await readFile(
+    repoFile("/public/assets/hero-poster.webp"),
+  );
+
+  assert.deepEqual(readLossyWebpDimensions(poster), {
+    width: 3840,
+    height: 2160,
+  });
 });
 
 test("project artwork policy avoids downloading hidden imagery", () => {

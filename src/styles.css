@@ -108,8 +108,8 @@ a:focus-visible {
   opacity: 0;
   filter: brightness(0.98);
   transition:
-    opacity 1050ms cubic-bezier(0.16, 0.76, 0.22, 1),
-    filter 1050ms cubic-bezier(0.16, 0.76, 0.22, 1);
+    opacity 1800ms cubic-bezier(0.16, 0.76, 0.22, 1),
+    filter 1800ms cubic-bezier(0.16, 0.76, 0.22, 1);
 }
 
 .hero__cycle-scene {
@@ -840,7 +840,7 @@ a:focus-visible {
 
 .experience-row span:nth-child(2),
 .experience-row time {
-  color: rgba(229, 235, 235, 0.28);
+  color: rgba(229, 235, 235, 0.55);
 }
 
 .experience-row span:first-child {

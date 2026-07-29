@@ -401,7 +401,10 @@ test("Hero CSS layers the settled spatial view and reveals content in order", as
     css,
     /\.hero__video,[\s\S]*?\.hero__cycle-scene\s*\{[\s\S]*?object-fit:\s*cover/,
   );
-  assert.match(css, /\.hero__final-scene\s*\{[\s\S]*?1050ms/);
+  assert.match(
+    cssDeclarations(baseCss(css), ".hero__final-scene"),
+    /opacity\s+1800ms[\s\S]*filter\s+1800ms/,
+  );
   assert.match(css, /\.hero__cycle-scene\s*\{[\s\S]*?opacity:\s*0/);
   assert.match(css, /\.hero--revealed \.hero__cycle-scene/);
   assert.match(css, /\.hero-typewriter__cursor/);
@@ -501,6 +504,10 @@ test("support copy and Hero cursor use the revised visual hierarchy", async () =
   assert.match(
     cssDeclarations(desktop, ".contact__details"),
     /color:\s*rgba\(233,\s*239,\s*239,\s*0\.65\)/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".experience-row span:nth-child(2)"),
+    /color:\s*rgba\(229,\s*235,\s*235,\s*0\.55\)/,
   );
   assert.match(
     cssDeclarations(desktop, ".hero-typewriter__cursor"),
