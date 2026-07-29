@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { experience, principles, projects } from "./portfolio-data.js";
 import { CaseStudyModal } from "./CaseStudyModal.jsx";
-import { CopyButton } from "./CopyButton.jsx";
+import { ContactSection } from "./ContactSection.jsx";
 import { ExperienceSection } from "./ExperienceSection.jsx";
 import { HeroSection } from "./HeroSection.jsx";
 import { PointerLight } from "./PointerLight.jsx";
@@ -97,37 +97,7 @@ export function App() {
 
           <ExperienceSection items={experience} />
 
-          <section
-            className="contact"
-            id="contact"
-            data-track-section
-            data-track-label="LET’S TALK"
-          >
-            <div className="contact__content">
-              <h2>LET&apos;S TALK</h2>
-              <p className="contact__details">
-                <a href="mailto:long.kidq@gmail.com">
-                  E-mail：long.kidq@gmail.com
-                </a>
-                <span aria-hidden="true">|</span>
-                <span>Wechat：LKchat1980</span>
-                <span aria-hidden="true">|</span>
-                <a href="tel:+8618520224719">Mobile：18520224719</a>
-              </p>
-              <CopyButton
-                className="button button--light contact__button"
-                value="long.kidq@gmail.com"
-                label="start a conversation"
-                copiedLabel="已复制邮箱"
-                trackLabel="start a conversation"
-                showArrow
-              />
-            </div>
-            <footer className="footer">
-              <span>© 2026 Kid Long · 龙昊翔</span>
-              <span>AIGC × Visual Design Expert</span>
-            </footer>
-          </section>
+          <ContactSection />
         </main>
         <VisitorMonitor />
       </div>

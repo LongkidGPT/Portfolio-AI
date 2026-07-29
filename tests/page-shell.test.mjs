@@ -19,12 +19,13 @@ function baseCss(css) {
 }
 
 test("page shell contains all five navigation destinations", async () => {
-  const [app, heroSection, experienceSection] = await Promise.all([
+  const [app, heroSection, experienceSection, contactSection] = await Promise.all([
     readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
     readFile(new URL("../src/HeroSection.jsx", import.meta.url), "utf8"),
     readFile(new URL("../src/ExperienceSection.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/ContactSection.jsx", import.meta.url), "utf8"),
   ]);
-  const pageShell = `${app}\n${heroSection}\n${experienceSection}`;
+  const pageShell = `${app}\n${heroSection}\n${experienceSection}\n${contactSection}`;
 
   for (const id of ["hero", "approach", "work", "experience", "contact"]) {
     assert.match(pageShell, new RegExp(`id="${id}"`));
@@ -402,6 +403,15 @@ test("Contact uses the optimized replacement background", async () => {
 
   assert.match(
     css,
-    /\.contact\s*\{[\s\S]*?url\("\/assets\/contact-bg\.webp"\)[\s\S]*?cover/,
+    /\.contact\s*\{[\s\S]*?url\("\/assets\/contact-bg-03\.webp"\)[\s\S]*?cover/,
+  );
+});
+
+test("Experience company names carry the primary white hierarchy", async () => {
+  const css = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+
+  assert.match(
+    css,
+    /\.experience-row span:first-child\s*\{[\s\S]*?color:\s*#fff/,
   );
 });

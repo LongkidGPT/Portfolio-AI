@@ -799,6 +799,10 @@ a:focus-visible {
   color: rgba(229, 235, 235, 0.28);
 }
 
+.experience-row span:first-child {
+  color: #fff;
+}
+
 .experience-row time {
   white-space: nowrap;
 }
@@ -812,7 +816,7 @@ a:focus-visible {
   overflow: hidden;
   background:
     #001011
-    url("/assets/contact-bg.webp")
+    url("/assets/contact-bg-03.webp")
     50% 50% / cover
     no-repeat;
   text-align: center;
@@ -873,6 +877,22 @@ a:focus-visible {
 }
 
 .contact__details a:hover {
+  color: #fff;
+}
+
+.contact__copy-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.contact__copy-link:hover,
+.contact__copy-link.copy-action--copied {
+  border: 0;
+  background: transparent;
   color: #fff;
 }
 

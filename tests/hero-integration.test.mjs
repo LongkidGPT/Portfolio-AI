@@ -61,14 +61,16 @@ test("scrub waits for the final requested video frame to be presented", async ()
 });
 
 test("App delegates the Hero without changing the remaining page sections", async () => {
-  const source = await readFile(
-    new URL("../src/App.jsx", import.meta.url),
-    "utf8",
-  );
+  const [source, contactSource] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/ContactSection.jsx", import.meta.url), "utf8"),
+  ]);
 
   assert.match(source, /<HeroSection \/>/);
   assert.doesNotMatch(source, /attemptPlayback/);
-  for (const id of ["approach", "work", "contact"]) {
+  for (const id of ["approach", "work"]) {
     assert.match(source, new RegExp(`id="${id}"`));
   }
+  assert.match(source, /<ContactSection \/>/);
+  assert.match(contactSource, /id="contact"/);
 });
