@@ -111,7 +111,7 @@ test("typewriter types both title lines then keeps the cursor for one second", a
     const title = document.querySelector("h1");
     assert.equal(
       title.getAttribute("aria-label"),
-      "Design for Business Momentum",
+      "DESIGN FOR BUSINESS MOMENTUM",
     );
     assert.equal(environment.pending(30), 1);
 
@@ -121,7 +121,7 @@ test("typewriter types both title lines then keeps the cursor for one second", a
 
     assert.match(
       document.querySelector(".hero-typewriter__typed").textContent,
-      /Design for Business\s*Momentum/,
+      /DESIGN FOR BUSINESS\s*MOMENTUM/,
     );
     assert.ok(document.querySelector(".hero-typewriter__cursor"));
     assert.equal(environment.pending(1000), 1);
@@ -153,8 +153,8 @@ test("reduced motion exposes the complete title without typing timers", async ()
       );
     });
 
-    assert.match(document.querySelector("h1").textContent, /Design for Business/);
-    assert.match(document.querySelector("h1").textContent, /Momentum/);
+    assert.match(document.querySelector("h1").textContent, /DESIGN FOR BUSINESS/);
+    assert.match(document.querySelector("h1").textContent, /MOMENTUM/);
     assert.equal(document.querySelector(".hero-typewriter__cursor"), null);
     assert.equal(environment.pending(30), 0);
     assert.equal(completed, 1);

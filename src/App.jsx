@@ -49,9 +49,9 @@ export function App() {
               <div className="approach__layout">
                 <header className="approach__intro">
                   <h2>
-                    How I Move
+                    HOW I MOVE
                     <br />
-                    Design Forward
+                    DESIGN FORWARD
                   </h2>
                   <p>从判断问题开始，到定义方向、推动交付、沉淀方法</p>
                 </header>
@@ -80,7 +80,7 @@ export function App() {
             <div className="shell">
               <SectionLabel number="02">SELECTED WORK</SectionLabel>
               <header className="section-heading">
-                <h2>Proof Through Projects</h2>
+                <h2>PROOF THROUGH PROJECTS</h2>
                 <p>以三个代表项目，呈现从业务拆解到全渠道落地的架构与闭环能力</p>
               </header>
               <div className="project-grid">

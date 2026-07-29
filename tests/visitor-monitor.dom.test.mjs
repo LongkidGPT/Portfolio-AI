@@ -126,9 +126,10 @@ test("Live Signal starts collapsed on both mobile and desktop", async () => {
     await act(async () => click(mobileLauncher));
     assert.equal(mobileLauncher.getAttribute("aria-expanded"), "true");
     assert.ok(document.querySelector(".visitor-monitor__body"));
-    assert.ok(
+    assert.equal(
       document.querySelector(".visitor-monitor__mask"),
-      "the existing blurred public mode must still open",
+      null,
+      "the default open mode must expose the Live Signal data",
     );
 
     await act(async () => root.unmount());

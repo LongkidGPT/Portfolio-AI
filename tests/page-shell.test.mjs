@@ -41,8 +41,8 @@ test("Experience section exposes the editorial career structure", async () => {
   assert.match(experienceSection, /className="experience__intro"/);
   assert.match(experienceSection, /className="experience-list"/);
   assert.match(experienceSection, /className="experience-row"/);
-  assert.match(experienceSection, /Across Brand,/);
-  assert.match(experienceSection, /Product and Market/);
+  assert.match(experienceSection, /ACROSS BRAND,/);
+  assert.match(experienceSection, /PRODUCT AND MARKET/);
   assert.match(experienceSection, /data-track-label="EXPERIENCE"/);
   assert.doesNotMatch(
     css,
@@ -432,7 +432,7 @@ test("Experience company names carry the primary white hierarchy", async () => {
   );
 });
 
-test("page typography uses the self-hosted Geist Mono hierarchy", async () => {
+test("page typography uses Mont ExtraLight headings and Inter support text", async () => {
   const [app, css] = await Promise.all([
     readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
     readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
@@ -441,24 +441,32 @@ test("page typography uses the self-hosted Geist Mono hierarchy", async () => {
 
   assert.match(
     css,
-    /@font-face\s*\{[\s\S]*?font-family:\s*"Geist Mono"[\s\S]*?geist-mono-variable\.woff2[\s\S]*?font-weight:\s*100 900/,
+    /@font-face\s*\{[\s\S]*?font-family:\s*"Mont"[\s\S]*?mont-extralight\.otf[\s\S]*?font-weight:\s*200/,
+  );
+  assert.match(
+    css,
+    /@font-face\s*\{[\s\S]*?font-family:\s*"Inter"[\s\S]*?inter-variable\.woff2[\s\S]*?font-weight:\s*100 900/,
   );
   assert.match(
     cssDeclarations(desktop, ":root"),
-    /--font-mono:\s*"Geist Mono"/,
+    /--font-display:\s*"Mont"/,
   );
   assert.match(
     cssDeclarations(desktop, ":root"),
-    /font-family:\s*var\(--font-mono\),\s*var\(--font-cjk\),\s*monospace/,
+    /--font-body:\s*"Inter"/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ":root"),
+    /font-family:\s*var\(--font-body\),\s*var\(--font-cjk\),\s*sans-serif/,
   );
   assert.match(cssDeclarations(desktop, ":root"), /font-weight:\s*200/);
   assert.match(
     cssDeclarations(desktop, ".approach__intro h2"),
-    /font-weight:\s*100/,
+    /font-family:\s*var\(--font-display\),\s*var\(--font-cjk\),\s*sans-serif[\s\S]*font-weight:\s*200[\s\S]*text-transform:\s*uppercase/,
   );
   assert.match(
     cssDeclarations(desktop, ".hero__content h1"),
-    /font-weight:\s*100/,
+    /font-family:\s*var\(--font-display\),\s*var\(--font-cjk\),\s*sans-serif[\s\S]*font-weight:\s*200[\s\S]*text-transform:\s*uppercase/,
   );
   assert.match(
     cssDeclarations(desktop, ".section-label"),
@@ -482,7 +490,7 @@ test("page typography uses the self-hosted Geist Mono hierarchy", async () => {
   );
   assert.match(
     cssDeclarations(desktop, ".visitor-monitor"),
-    /font-family:\s*var\(--font-mono\),\s*var\(--font-cjk\),\s*monospace/,
+    /font-family:\s*var\(--font-body\),\s*var\(--font-cjk\),\s*sans-serif/,
   );
   assert.match(
     cssDeclarations(desktop, ".visitor-monitor"),
@@ -490,9 +498,9 @@ test("page typography uses the self-hosted Geist Mono hierarchy", async () => {
   );
 
   for (const title of [
-    "How I Move",
-    "Design Forward",
-    "Proof Through Projects",
+    "HOW I MOVE",
+    "DESIGN FORWARD",
+    "PROOF THROUGH PROJECTS",
   ]) {
     assert.match(app, new RegExp(title));
   }

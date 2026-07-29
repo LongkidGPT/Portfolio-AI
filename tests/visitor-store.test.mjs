@@ -15,6 +15,28 @@ function createMemoryStorage() {
   };
 }
 
+test("a fresh Live Signal store is viewable by default", () => {
+  const store = createAnalyticsStore({ storage: createMemoryStorage() });
+
+  assert.equal(store.getState().mode, "open");
+});
+
+test("legacy blurred state migrates to viewable without losing sessions", () => {
+  const storage = createMemoryStorage();
+  storage.setItem(
+    "kid-portfolio-visitor-analytics-v1",
+    JSON.stringify({
+      mode: "blurred",
+      sessions: [{ id: "legacy-session" }],
+    }),
+  );
+
+  const state = createAnalyticsStore({ storage }).getState();
+
+  assert.equal(state.mode, "open");
+  assert.deepEqual(state.sessions, [{ id: "legacy-session" }]);
+});
+
 test("local store persists repeated sessions and the public presentation mode", () => {
   const storage = createMemoryStorage();
   const store = createAnalyticsStore({ storage });
@@ -29,11 +51,11 @@ test("local store persists repeated sessions and the public presentation mode", 
     visitorId: "anker-hr-a8f3",
     startedAt: 2000,
   });
-  store.setMode("open");
+  store.setMode("blurred");
 
   const reloaded = createAnalyticsStore({ storage }).getState();
 
-  assert.equal(reloaded.mode, "open");
+  assert.equal(reloaded.mode, "blurred");
   assert.deepEqual(
     reloaded.sessions.map((session) => session.id),
     ["session-02", "session-01"],

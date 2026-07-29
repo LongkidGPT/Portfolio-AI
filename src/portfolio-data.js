@@ -99,7 +99,7 @@ export const experience = [
     period: "2021.06 – 2023.12",
   },
   {
-    company: "熵思鑫创意 Extend",
+    company: "熠思霆创意 Extend",
     role: "视觉设计组长（带 4 人团队）",
     period: "2018.02 – 2021.06",
   },

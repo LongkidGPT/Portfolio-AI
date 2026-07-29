@@ -7,7 +7,8 @@ import {
 
 const STORAGE_KEY = "kid-portfolio-visitor-analytics-v1";
 const CHANNEL_NAME = "kid-portfolio-visitor-analytics";
-const EMPTY_STATE = { mode: "blurred", sessions: [] };
+const STATE_VERSION = 2;
+const EMPTY_STATE = { version: STATE_VERSION, mode: "open", sessions: [] };
 
 function readState(storage) {
   try {
@@ -16,6 +17,13 @@ function readState(storage) {
       (stored?.mode === "open" || stored?.mode === "blurred") &&
       Array.isArray(stored.sessions)
     ) {
+      if (stored.version !== STATE_VERSION) {
+        return {
+          ...stored,
+          version: STATE_VERSION,
+          mode: "open",
+        };
+      }
       return stored;
     }
   } catch {

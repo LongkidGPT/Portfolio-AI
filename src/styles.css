@@ -1,6 +1,14 @@
 @font-face {
-  font-family: "Geist Mono";
-  src: url("/assets/fonts/geist-mono-variable.woff2") format("woff2");
+  font-family: "Mont";
+  src: url("/assets/fonts/mont-extralight.otf") format("opentype");
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/inter-variable.woff2") format("woff2");
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -9,10 +17,11 @@
 :root {
   color: #f1f4f4;
   background: #000;
-  --font-mono: "Geist Mono";
+  --font-display: "Mont";
+  --font-body: "Inter";
   --font-cjk:
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-weight: 200;
   font-synthesis: none;
   --shell: min(78vw, 1180px);
@@ -192,7 +201,7 @@ a:focus-visible {
   border-radius: 999px;
   background: rgba(0, 7, 8, 0.25);
   backdrop-filter: blur(10px);
-  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 12px;
   isolation: isolate;
   letter-spacing: 0.02em;
@@ -320,10 +329,12 @@ a:focus-visible {
 .hero__content h1 {
   position: relative;
   margin: 0;
+  font-family: var(--font-display), var(--font-cjk), sans-serif;
   font-size: clamp(48px, 4.35vw, 76px);
-  font-weight: 100;
+  font-weight: 200;
   line-height: 1.08;
   letter-spacing: -0.035em;
+  text-transform: uppercase;
 }
 
 .hero-typewriter__ghost,
@@ -381,7 +392,7 @@ a:focus-visible {
   gap: 9px;
   padding: 0 28px;
   border-radius: 999px;
-  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.01em;
@@ -412,7 +423,7 @@ a:focus-visible {
   background: rgba(0, 9, 10, 0.18);
   color: rgba(230, 237, 237, 0.42);
   backdrop-filter: blur(8px);
-  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 12px;
   font-weight: 400;
 }
@@ -482,7 +493,7 @@ a:focus-visible {
   background: rgba(0, 0, 0, 0.78);
   color: #fff;
   cursor: pointer;
-  font: 200 12px/1 var(--font-mono), var(--font-cjk), monospace;
+  font: 200 12px/1 var(--font-body), var(--font-cjk), sans-serif;
 }
 
 .case-study__loading,
@@ -491,7 +502,7 @@ a:focus-visible {
   place-items: center;
   min-height: 64px;
   color: rgba(245, 248, 248, 0.72);
-  font: 200 12px/1.5 var(--font-mono), var(--font-cjk), monospace;
+  font: 200 12px/1.5 var(--font-body), var(--font-cjk), sans-serif;
 }
 
 .case-study__loading {
@@ -555,7 +566,7 @@ a:focus-visible {
   gap: 18px;
   margin: 0;
   color: rgba(223, 231, 231, 0.36);
-  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.08em;
@@ -581,10 +592,12 @@ a:focus-visible {
 .experience__intro h2,
 .contact h2 {
   margin: 0;
+  font-family: var(--font-display), var(--font-cjk), sans-serif;
   font-size: clamp(40px, 3.25vw, 56px);
-  font-weight: 100;
+  font-weight: 200;
   line-height: 1.02;
   letter-spacing: -0.035em;
+  text-transform: uppercase;
 }
 
 .approach__intro p,
@@ -618,7 +631,7 @@ a:focus-visible {
 
 .principles__number {
   color: rgba(226, 233, 233, 0.28);
-  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 12px;
 }
 
@@ -976,7 +989,7 @@ a:focus-visible {
     inset 0 1px rgba(255, 255, 255, 0.035);
   color: rgba(235, 244, 244, 0.88);
   backdrop-filter: blur(22px);
-  font-family: var(--font-mono), var(--font-cjk), monospace;
+  font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 10px;
   font-weight: 400;
   letter-spacing: 0.055em;

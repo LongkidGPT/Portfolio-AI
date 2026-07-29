@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const titleLines = ["Design for Business", "Momentum"];
+const titleLines = ["DESIGN FOR BUSINESS", "MOMENTUM"];
 const titleLength = titleLines.reduce((total, line) => total + line.length, 0);
 const typeDelay = 30;
 const cursorHoldDelay = 1000;
@@ -58,11 +58,11 @@ export function HeroTypewriter({ active, onComplete }) {
   return (
     <h1
       className="hero-typewriter"
-      aria-label="Design for Business Momentum"
+      aria-label="DESIGN FOR BUSINESS MOMENTUM"
     >
       <span className="hero-typewriter__ghost" aria-hidden="true">
-        <span>Design for Business</span>
-        <span>Momentum</span>
+        <span>DESIGN FOR BUSINESS</span>
+        <span>MOMENTUM</span>
       </span>
       <span className="hero-typewriter__typed" aria-hidden="true">
         <span>
