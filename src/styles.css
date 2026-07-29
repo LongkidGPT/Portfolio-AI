@@ -383,6 +383,7 @@ a:focus-visible {
   border-radius: 999px;
   font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 12px;
+  font-weight: 400;
   letter-spacing: 0.01em;
   transition:
     transform 180ms ease,
@@ -413,6 +414,7 @@ a:focus-visible {
   backdrop-filter: blur(8px);
   font-family: var(--font-mono), var(--font-cjk), monospace;
   font-size: 12px;
+  font-weight: 400;
 }
 
 .copy-action {

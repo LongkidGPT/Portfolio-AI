@@ -465,6 +465,22 @@ test("page typography uses the self-hosted Geist Mono hierarchy", async () => {
     /font-weight:\s*400/,
   );
   assert.match(
+    cssDeclarations(desktop, ".button"),
+    /font-size:\s*12px/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".button"),
+    /font-weight:\s*400/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".wechat-pill"),
+    /font-size:\s*12px/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".wechat-pill"),
+    /font-weight:\s*400/,
+  );
+  assert.match(
     cssDeclarations(desktop, ".visitor-monitor"),
     /font-family:\s*var\(--font-mono\),\s*var\(--font-cjk\),\s*monospace/,
   );

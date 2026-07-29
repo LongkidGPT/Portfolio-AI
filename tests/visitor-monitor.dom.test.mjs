@@ -109,7 +109,7 @@ function click(element) {
   );
 }
 
-test("390x844 starts with only Live Signal visible while desktop stays expanded", async () => {
+test("Live Signal starts collapsed on both mobile and desktop", async () => {
   const environment = installDom();
   let root = createRoot(document.querySelector("#root"));
 
@@ -142,9 +142,9 @@ test("390x844 starts with only Live Signal visible while desktop stays expanded"
       document
         .querySelector(".visitor-monitor__bar")
         .getAttribute("aria-expanded"),
-      "true",
+      "false",
     );
-    assert.ok(document.querySelector(".visitor-monitor__body"));
+    assert.equal(document.querySelector(".visitor-monitor__body"), null);
   } finally {
     await act(async () => root.unmount());
     environment.restore();
