@@ -16,7 +16,9 @@
 
 :root {
   color: #f1f4f4;
-  background: #000;
+  --page-bg: #0d0d0d;
+  --page-bg-fade: rgba(13, 13, 13, 0.88);
+  background: var(--page-bg);
   --font-display: "Mont";
   --font-body: "Inter";
   --font-cjk:
@@ -33,13 +35,18 @@
   --heading-support-gap-compact: 19.6px;
 }
 
+:root[data-page-background="black"] {
+  --page-bg: #000000;
+  --page-bg-fade: rgba(0, 0, 0, 0.88);
+}
+
 * {
   box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
-  background: #000;
+  background: var(--page-bg);
 }
 
 body {
@@ -47,7 +54,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
-  background: #000;
+  background: var(--page-bg);
   color: #f1f4f4;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
@@ -546,13 +553,13 @@ a:focus-visible {
   z-index: 2;
   margin-top: 100svh;
   overflow-x: hidden;
-  background: #000;
+  background: var(--page-bg);
   box-shadow: 0 -32px 80px rgba(0, 0, 0, 0.45);
 }
 
 .section {
   position: relative;
-  background: #000;
+  background: var(--page-bg);
 }
 
 .approach {
@@ -874,8 +881,8 @@ a:focus-visible {
   place-items: center;
   overflow: hidden;
   background:
-    #001011
-    url("/assets/contact-bg-03.webp")
+    var(--page-bg)
+    url("/assets/contact-bg-04.webp")
     50% 50% / cover
     no-repeat;
   text-align: center;
@@ -885,7 +892,14 @@ a:focus-visible {
   position: absolute;
   inset: 0;
   content: "";
-  background: radial-gradient(circle at 50% 48%, transparent 0, rgba(0, 0, 0, 0.35) 70%);
+  background:
+    linear-gradient(
+      180deg,
+      var(--page-bg) 0%,
+      var(--page-bg-fade) 8%,
+      transparent 28%
+    ),
+    radial-gradient(circle at 50% 48%, transparent 0, rgba(0, 0, 0, 0.35) 70%);
   pointer-events: none;
 }
 

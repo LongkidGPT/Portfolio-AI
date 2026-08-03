@@ -419,7 +419,31 @@ test("Contact uses the optimized replacement background", async () => {
 
   assert.match(
     css,
-    /\.contact\s*\{[\s\S]*?url\("\/assets\/contact-bg-03\.webp"\)[\s\S]*?cover/,
+    /\.contact\s*\{[\s\S]*?url\("\/assets\/contact-bg-04\.webp"\)[\s\S]*?cover/,
+  );
+});
+
+test("page surfaces use the warm off-black base and Contact blends into it", async () => {
+  const css = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  const desktop = baseCss(css);
+
+  assert.match(cssDeclarations(desktop, ":root"), /--page-bg:\s*#0d0d0d/);
+
+  for (const selector of ["html", "body", ".content-layer", ".section"]) {
+    assert.match(
+      cssDeclarations(desktop, selector),
+      /background:\s*var\(--page-bg\)/,
+      `${selector} should inherit the shared page surface`,
+    );
+  }
+
+  assert.match(
+    cssDeclarations(desktop, ".contact"),
+    /background:[\s\S]*?var\(--page-bg\)[\s\S]*?url\("\/assets\/contact-bg-04\.webp"\)/,
+  );
+  assert.match(
+    cssDeclarations(desktop, ".contact::after"),
+    /linear-gradient\(\s*180deg,\s*var\(--page-bg\)\s*0%,[\s\S]*?transparent\s*28%\s*\)/,
   );
 });
 
