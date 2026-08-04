@@ -71,7 +71,7 @@ export function HeroSection() {
           poster="/assets/hero-first-frame.webp"
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           onError={failMedia}
         />
         <img

@@ -403,7 +403,11 @@ test("Hero CSS layers the settled spatial view and reveals content in order", as
   );
   assert.match(
     cssDeclarations(baseCss(css), ".hero__final-scene"),
-    /opacity\s+1800ms[\s\S]*filter\s+1800ms/,
+    /opacity\s+1600ms[\s\S]*filter\s+2200ms/,
+  );
+  assert.match(
+    cssDeclarations(baseCss(css), ".hero__video"),
+    /opacity\s+300ms/,
   );
   assert.match(css, /\.hero__cycle-scene\s*\{[\s\S]*?opacity:\s*0/);
   assert.match(css, /\.hero--revealed \.hero__cycle-scene/);

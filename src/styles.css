@@ -117,15 +117,16 @@ a:focus-visible {
 
 .hero__video {
   opacity: 1;
+  transition: opacity 300ms cubic-bezier(0.32, 0, 0.67, 0);
 }
 
 .hero__final-scene {
   z-index: 1;
   opacity: 0;
-  filter: brightness(0.98);
+  filter: brightness(0.72);
   transition:
-    opacity 1800ms cubic-bezier(0.16, 0.76, 0.22, 1),
-    filter 1800ms cubic-bezier(0.16, 0.76, 0.22, 1);
+    opacity 1600ms cubic-bezier(0.16, 0.76, 0.22, 1),
+    filter 2200ms cubic-bezier(0.16, 0.76, 0.22, 1);
 }
 
 .hero__cycle-scene {
@@ -139,6 +140,12 @@ a:focus-visible {
 .hero--released .hero__final-scene {
   opacity: 1;
   filter: brightness(1);
+}
+
+.hero--resolving .hero__video,
+.hero--revealed .hero__video,
+.hero--released .hero__video {
+  opacity: 0;
 }
 
 .hero--revealed .hero__cycle-scene,

@@ -50,15 +50,16 @@ test("scrub waits for the final requested video frame to be presented", async ()
     "utf8",
   );
 
-  assert.match(source, /lastPresentedProgress/);
+  assert.match(source, /lastPresentedTime/);
   assert.match(
     source,
-    /requestVideoFrameCallback\(\(\) => \{[\s\S]*?lastPresentedProgress = requestedProgress/,
+    /requestVideoFrameCallback\(\(\) => \{[\s\S]*?lastPresentedTime = nextTime/,
   );
-  assert.match(source, /requestSeek\(rendered \* finalUsableTime, rendered\)/);
+  assert.match(source, /Math\.round\(rendered \* finalUsableTime \* HERO_VIDEO_FPS\)/);
+  assert.match(source, /requestSeek\(frameTime, rendered, timestamp\)/);
   assert.match(
     source,
-    /rendered >= 0\.999 &&[\s\S]*?lastPresentedProgress === 1 &&/,
+    /lastPresentedTime >=[\s\S]*?finalUsableTime - 1 \/ \(HERO_VIDEO_FPS \* 2\)/,
   );
 });
 

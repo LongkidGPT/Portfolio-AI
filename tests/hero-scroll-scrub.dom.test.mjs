@@ -42,6 +42,7 @@ function installDom({ mediaMatches = {}, styles = "" } = {}) {
   );
   const previousGlobals = {};
   const animationFrames = new Map();
+  let animationTime = 0;
   const mediaQueries = new Map();
   const timers = new Map();
   let nextAnimationFrameId = 1;
@@ -141,10 +142,11 @@ function installDom({ mediaMatches = {}, styles = "" } = {}) {
         timer.callback();
       }
     },
-    stepAnimationFrame() {
+    stepAnimationFrame(elapsed = 1000 / 60) {
+      animationTime += elapsed;
       const pending = [...animationFrames.entries()];
       animationFrames.clear();
-      for (const [, callback] of pending) callback(performance.now());
+      for (const [, callback] of pending) callback(animationTime);
     },
     setMediaMatch(query, matches) {
       dom.window.matchMedia(query).dispatch(matches);
@@ -162,13 +164,22 @@ function installDom({ mediaMatches = {}, styles = "" } = {}) {
 function createFakeVideo({ videoFrameCallback = true } = {}) {
   const video = new window.EventTarget();
   const frameCallbacks = new Map();
+  const seekTimes = [];
   let nextFrameId = 1;
+  let currentTime = 0;
 
   Object.assign(video, {
-    currentTime: 0,
     duration: 8,
     readyState: 4,
     pause() {},
+  });
+  Object.defineProperty(video, "currentTime", {
+    configurable: true,
+    get: () => currentTime,
+    set(value) {
+      currentTime = value;
+      seekTimes.push(value);
+    },
   });
 
   if (videoFrameCallback) {
@@ -183,6 +194,8 @@ function createFakeVideo({ videoFrameCallback = true } = {}) {
 
   return {
     video,
+    seekTimes,
+    pendingFrameCount: () => frameCallbacks.size,
     commitNextFrame() {
       const pending = frameCallbacks.entries().next();
       assert.equal(pending.done, false, "expected an in-flight video frame");
@@ -262,6 +275,98 @@ async function cleanupHarness(root, environment) {
   environment.restore();
 }
 
+test("scrub seeks stay on 24fps frame boundaries and serialize the latest target", async () => {
+  const environment = installDom();
+  const fakeVideo = createFakeVideo();
+  const harness = await renderScrubHarness(fakeVideo.video);
+
+  try {
+    await act(async () => {
+      dispatchWheel(window, { deltaY: 420 });
+      environment.stepAnimationFrame();
+    });
+
+    const firstSeek = fakeVideo.seekTimes.at(-1);
+    assert.ok(firstSeek > 0);
+    assert.equal(Number.isInteger(firstSeek * 24), true);
+    assert.equal(fakeVideo.pendingFrameCount(), 1);
+
+    const seekCountWhilePending = fakeVideo.seekTimes.length;
+    await act(async () => {
+      dispatchWheel(window, { deltaY: 420 });
+    });
+    assert.equal(
+      fakeVideo.seekTimes.length,
+      seekCountWhilePending,
+      "an in-flight frame must absorb newer targets without issuing another seek",
+    );
+
+    await act(async () => {
+      fakeVideo.commitNextFrame();
+      environment.stepAnimationFrame(16);
+    });
+    assert.equal(
+      fakeVideo.seekTimes.length,
+      seekCountWhilePending,
+      "completed frames must still respect the 24fps request cadence",
+    );
+
+    await act(async () => {
+      environment.stepAnimationFrame(26);
+    });
+    const latestSeek = fakeVideo.seekTimes.at(-1);
+    assert.ok(latestSeek > firstSeek);
+    assert.equal(Number.isInteger(latestSeek * 24), true);
+    assert.equal(fakeVideo.pendingFrameCount(), 1);
+  } finally {
+    await cleanupHarness(harness.root, environment);
+  }
+});
+
+test("the first presented final frame resolves without a duplicate tail seek", async () => {
+  const environment = installDom();
+  const fakeVideo = createFakeVideo();
+  const harness = await renderScrubHarness(fakeVideo.video);
+
+  try {
+    await act(async () => {
+      for (let index = 0; index < 7; index += 1) {
+        dispatchWheel(window, { deltaY: 420 });
+      }
+    });
+
+    let finalSeekCount = 0;
+    for (let index = 0; index < 120; index += 1) {
+      await act(async () => {
+        environment.stepAnimationFrame(42);
+        if (fakeVideo.pendingFrameCount() === 1) {
+          const isFinalFrame =
+            fakeVideo.video.currentTime >= 191 / 24 - 1e-6;
+          if (isFinalFrame) finalSeekCount = fakeVideo.seekTimes.length;
+          fakeVideo.commitNextFrame();
+        }
+      });
+      if (finalSeekCount > 0) break;
+    }
+
+    assert.ok(finalSeekCount > 0, "expected the final usable frame to be sought");
+
+    await act(async () => {
+      environment.stepAnimationFrame(42);
+    });
+
+    assert.equal(harness.state(), "resolving");
+    assert.equal(fakeVideo.pendingFrameCount(), 0);
+    assert.equal(
+      fakeVideo.seekTimes.length,
+      finalSeekCount,
+      "the final usable frame must not be sought twice",
+    );
+  } finally {
+    await cleanupHarness(harness.root, environment);
+  }
+});
+
 test("a later stuck video-frame seek times out and stops capturing native scroll", async () => {
   const environment = installDom();
   const fakeVideo = createFakeVideo();
@@ -281,7 +386,7 @@ test("a later stuck video-frame seek times out and stops capturing native scroll
 
     await act(async () => {
       dispatchWheel();
-      environment.stepAnimationFrame();
+      environment.stepAnimationFrame(42);
     });
     assert.equal(
       environment.pendingTimers(4000),
@@ -324,8 +429,43 @@ test("fallback seeked commits clear their per-seek watchdog", async () => {
   }
 });
 
-test("stalled, abort, and error media events each release native scrolling", async () => {
-  for (const eventType of ["stalled", "abort", "error"]) {
+test("a stalled seek waits for its watchdog and never jumps the video to its tail", async () => {
+  const environment = installDom();
+  const fakeVideo = createFakeVideo();
+  const harness = await renderScrubHarness(fakeVideo.video);
+
+  try {
+    await act(async () => {
+      dispatchWheel();
+      environment.stepAnimationFrame();
+    });
+    const stalledTime = fakeVideo.video.currentTime;
+
+    await act(async () => {
+      fakeVideo.video.dispatchEvent(new window.Event("stalled"));
+    });
+    assert.equal(harness.state(), "scrubbing");
+    let stalledWheel;
+    await act(async () => {
+      stalledWheel = dispatchWheel();
+    });
+    assert.equal(stalledWheel.defaultPrevented, true);
+    assert.equal(environment.pendingTimers(4000), 1);
+
+    await act(async () => {
+      environment.runTimers(4000);
+      environment.stepAnimationFrame();
+    });
+    assert.equal(harness.state(), "released");
+    assert.equal(fakeVideo.video.currentTime, stalledTime);
+    assert.equal(dispatchWheel().defaultPrevented, false);
+  } finally {
+    await cleanupHarness(harness.root, environment);
+  }
+});
+
+test("abort and error media events release native scrolling", async () => {
+  for (const eventType of ["abort", "error"]) {
     const environment = installDom();
     const fakeVideo = createFakeVideo();
     const harness = await renderScrubHarness(fakeVideo.video);
@@ -463,6 +603,10 @@ test("mounted Hero content is inert while hidden and interactive after release",
 
     const content = document.querySelector(".hero__content");
     assert.equal(
+      document.querySelector(".hero__video").getAttribute("preload"),
+      "auto",
+    );
+    assert.equal(
       document.querySelector(".hero__cycle-scene"),
       null,
       "disabled spatial view must not mount or request the cycle video",
@@ -474,7 +618,7 @@ test("mounted Hero content is inert while hidden and interactive after release",
     await act(async () => {
       document
         .querySelector(".hero__video")
-        .dispatchEvent(new window.Event("stalled"));
+        .dispatchEvent(new window.Event("error"));
     });
 
     assert.ok(document.querySelector(".hero--released"));

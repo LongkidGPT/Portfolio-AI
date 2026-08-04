@@ -10,6 +10,8 @@ import {
 } from "./hero-controller.js";
 
 const ADVANCE_KEYS = new Set(["ArrowDown", "PageDown", " "]);
+const HERO_VIDEO_FPS = 24;
+const MIN_SEEK_INTERVAL_MS = 1000 / HERO_VIDEO_FPS;
 const INTERACTIVE_KEY_TARGETS =
   "a, button, input, select, textarea, [contenteditable]:not([contenteditable='false'])";
 
@@ -82,10 +84,12 @@ export function useHeroScrollScrub({ videoRef }) {
     let animationFrameId = 0;
     let videoFrameId = null;
     let disposed = false;
-    let lastPresentedProgress = 0;
+    let lastPresentedTime = 0;
     let fallbackSeekProgress = null;
+    let fallbackSeekTime = null;
     let seekWatchdogId = null;
     let touchPoint = null;
+    let lastSeekRequestedAt = Number.NEGATIVE_INFINITY;
 
     const clearSeekWatchdog = () => {
       if (seekWatchdogId === null) return;
@@ -100,6 +104,7 @@ export function useHeroScrollScrub({ videoRef }) {
       }
       videoFrameId = null;
       fallbackSeekProgress = null;
+      fallbackSeekTime = null;
     };
 
     const handleMediaFailure = () => {
@@ -124,8 +129,9 @@ export function useHeroScrollScrub({ videoRef }) {
 
     const handleSeeked = () => {
       if (fallbackSeekProgress === null) return;
-      lastPresentedProgress = fallbackSeekProgress;
+      lastPresentedTime = fallbackSeekTime ?? video.currentTime;
       fallbackSeekProgress = null;
+      fallbackSeekTime = null;
       clearSeekWatchdog();
     };
 
@@ -229,9 +235,10 @@ export function useHeroScrollScrub({ videoRef }) {
       publishInput(window.innerHeight * 0.28, event);
     };
 
-    const requestSeek = (nextTime, requestedProgress) => {
+    const requestSeek = (nextTime, requestedProgress, timestamp) => {
       const needsFinalFrame =
-        requestedProgress === 1 && lastPresentedProgress !== 1;
+        requestedProgress === 1 &&
+        lastPresentedTime < nextTime - 1 / (HERO_VIDEO_FPS * 2);
 
       if (
         !readyRef.current ||
@@ -242,11 +249,19 @@ export function useHeroScrollScrub({ videoRef }) {
         return;
       }
 
+      if (
+        !needsFinalFrame &&
+        timestamp - lastSeekRequestedAt < MIN_SEEK_INTERVAL_MS
+      ) {
+        return;
+      }
+
       if ("requestVideoFrameCallback" in video) {
         if (videoFrameId !== null) return;
+        lastSeekRequestedAt = timestamp;
         video.currentTime = nextTime;
         videoFrameId = video.requestVideoFrameCallback(() => {
-          lastPresentedProgress = requestedProgress;
+          lastPresentedTime = nextTime;
           videoFrameId = null;
           clearSeekWatchdog();
         });
@@ -255,12 +270,22 @@ export function useHeroScrollScrub({ videoRef }) {
       }
 
       if (fallbackSeekProgress !== null) return;
+      lastSeekRequestedAt = timestamp;
       fallbackSeekProgress = requestedProgress;
+      fallbackSeekTime = nextTime;
       video.currentTime = nextTime;
       armSeekWatchdog();
     };
 
-    const render = () => {
+    const render = (timestamp = performance.now()) => {
+      if (
+        [HERO_STATES.REVEALED, HERO_STATES.RELEASED].includes(
+          modelRef.current.state,
+        )
+      ) {
+        return;
+      }
+
       const target = targetProgressRef.current;
       const current = renderedProgressRef.current;
       const difference = target - current;
@@ -269,13 +294,21 @@ export function useHeroScrollScrub({ videoRef }) {
 
       renderedProgressRef.current = rendered;
 
-      const finalUsableTime = Math.max((video.duration || 8) - 1 / 24, 0);
-      requestSeek(rendered * finalUsableTime, rendered);
+      const finalUsableTime = Math.max(
+        (video.duration || 8) - 1 / HERO_VIDEO_FPS,
+        0,
+      );
+      const frameTime = Math.min(
+        Math.round(rendered * finalUsableTime * HERO_VIDEO_FPS) /
+          HERO_VIDEO_FPS,
+        finalUsableTime,
+      );
+      requestSeek(frameTime, rendered, timestamp);
 
       if (
         target === 1 &&
-        rendered >= 0.999 &&
-        lastPresentedProgress === 1 &&
+        lastPresentedTime >=
+          finalUsableTime - 1 / (HERO_VIDEO_FPS * 2) &&
         modelRef.current.state === HERO_STATES.SCRUBBING
       ) {
         publish({ state: HERO_STATES.RESOLVING, progress: 1 });
@@ -290,7 +323,6 @@ export function useHeroScrollScrub({ videoRef }) {
     video.addEventListener("loadeddata", handleReady);
     video.addEventListener("canplay", handleReady);
     video.addEventListener("seeked", handleSeeked);
-    video.addEventListener("stalled", handleMediaFailure);
     video.addEventListener("abort", handleMediaFailure);
     video.addEventListener("error", handleMediaFailure);
     reducedMotionQuery.addEventListener("change", handleReducedMotionChange);
@@ -313,7 +345,6 @@ export function useHeroScrollScrub({ videoRef }) {
       video.removeEventListener("loadeddata", handleReady);
       video.removeEventListener("canplay", handleReady);
       video.removeEventListener("seeked", handleSeeked);
-      video.removeEventListener("stalled", handleMediaFailure);
       video.removeEventListener("abort", handleMediaFailure);
       video.removeEventListener("error", handleMediaFailure);
       reducedMotionQuery.removeEventListener(
