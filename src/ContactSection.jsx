@@ -1,4 +1,5 @@
 import { CopyButton } from "./CopyButton.jsx";
+import { footerTagline } from "./portfolio-data.js";
 
 export function ContactSection() {
   return (
@@ -36,7 +37,7 @@ export function ContactSection() {
       </div>
       <footer className="footer">
         <span>© 2026 Kid Long · 龙昊翔</span>
-        <span>AIGC × Visual Design Expert</span>
+        <span>{footerTagline}</span>
       </footer>
     </section>
   );

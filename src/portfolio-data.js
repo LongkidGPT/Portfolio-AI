@@ -1,3 +1,5 @@
+import { activeVariant } from "./variants/active.js";
+
 export const principles = [
   {
     number: "01",
@@ -50,42 +52,48 @@ export function resolveProjectArtwork(
   };
 }
 
-export const projects = [
-  {
+// 共享部分：图片、比例、id 等（各变体通用；会变的标题/描述放在 variants/<岗>.js）
+const projectBase = {
+  brand: {
     id: "brand",
     caseId: "brand",
-    className: "project-card--wide",
     defaultImage: "/assets/work-brand-default.webp",
     hoverImage: "/assets/work-brand-hover.webp",
     artworkRatio: "3600 / 1860",
     temporaryArtworkRatio: "3600 / 1246",
-    title: "品牌系统｜视觉语言定义",
-    description:
-      "负责视觉系统中的光影、影像与场景规则模块，将既有品牌战略转化为跨品牌、跨团队的可执行应用方法，并参与全球市场落地",
   },
-  {
+  marketing: {
     id: "marketing",
     caseId: "marketing",
-    className: "",
     defaultImage: "/assets/work-marketing-default.webp",
     hoverImage: "/assets/work-marketing-hover.webp",
     artworkRatio: "1748 / 1602",
     temporaryArtworkRatio: "1748 / 929",
-    title: "营销全案｜新品上市视觉",
-    description: "面向北美市场的DTC落地页设计与数据驱动优化，Pre-Order点击率提升2.6倍",
   },
-  {
+  system: {
     id: "system",
     caseId: "system",
-    className: "",
     defaultImage: "/assets/work-system-default.webp",
     hoverImage: "/assets/work-system-hover.webp",
     artworkRatio: "1748 / 1602",
     temporaryArtworkRatio: "1748 / 929",
-    title: "系统架构｜品牌包装规范",
-    description: "构建可复用包装规范体系，品牌视觉识别度提升32%，新SKU接入效率提升40%",
   },
-];
+};
+
+// 按当前变体的顺序 + 内容组合出 projects；宽卡由变体的 featured 决定
+export const projects = activeVariant.projectOrder.map((id) => {
+  const isFeatured = id === activeVariant.featured;
+  const className = isFeatured ? "project-card--wide" : "";
+  return {
+    ...projectBase[id],
+    ...activeVariant.projectContent[id],
+    className,
+  };
+});
+
+// 变体控制的文案（供 HeroSection / ContactSection 使用）
+export const heroSubtitle = activeVariant.heroSubtitle;
+export const footerTagline = activeVariant.footerTagline;
 
 export const experience = [
   {

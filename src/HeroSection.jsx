@@ -6,6 +6,7 @@ import { heroFeatures } from "./hero-features.js";
 import { HeroTypewriter } from "./HeroTypewriter.jsx";
 import { useCycleSpatialView } from "./use-cycle-spatial-view.js";
 import { useHeroScrollScrub } from "./use-hero-scroll-scrub.js";
+import { heroSubtitle } from "./portfolio-data.js";
 
 export function HeroSection() {
   const heroRef = useRef(null);
@@ -132,7 +133,7 @@ export function HeroSection() {
           )}
           onComplete={completeTypewriter}
         />
-        <p>以视觉系统、上市传播与用户体验，推动品牌认知与业务转化</p>
+        <p>{heroSubtitle}</p>
         <div className="hero__actions" onClick={handleHeroNavigation}>
           <a className="button button--light" href="#work">
             View selected work
