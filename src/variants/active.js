@@ -8,6 +8,6 @@ const variants = {
   default: defaultVariant,
 };
 
-const requested = import.meta.env.VITE_VARIANT || "default";
+const requested = import.meta.env?.VITE_VARIANT || "default";
 export const activeVariantName = variants[requested] ? requested : "default";
 export const activeVariant = variants[activeVariantName];

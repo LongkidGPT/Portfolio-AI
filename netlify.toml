@@ -12,3 +12,21 @@
 
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive"
+
+[[headers]]
+  for = "/_app/*"
+
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/"
+
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

@@ -169,19 +169,20 @@ a:focus-visible {
 .pointer-light {
   position: fixed;
   z-index: 30;
-  top: var(--pointer-y);
-  left: var(--pointer-x);
+  top: 0;
+  left: 0;
   width: clamp(130px, 13vw, 220px);
   max-width: none;
   aspect-ratio: 1;
   opacity: var(--pointer-opacity);
   transform:
+    translate3d(var(--pointer-x), var(--pointer-y), 0)
     translate(-50%, -50%)
     scale(var(--pointer-scale));
   filter: drop-shadow(0 0 22px rgba(62, 225, 231, 0.2));
   mix-blend-mode: screen;
   pointer-events: none;
-  will-change: top, left, transform, opacity;
+  will-change: transform, opacity;
 }
 
 .pointer-light.is-unavailable {
@@ -579,7 +580,7 @@ a:focus-visible {
   display: flex;
   gap: 18px;
   margin: 0;
-  color: rgba(223, 231, 231, 0.36);
+  color: rgba(223, 231, 231, 0.55);
   font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 11px;
   font-weight: 400;
@@ -644,7 +645,7 @@ a:focus-visible {
 }
 
 .principles__number {
-  color: rgba(226, 233, 233, 0.28);
+  color: rgba(226, 233, 233, 0.55);
   font-family: var(--font-body), var(--font-cjk), sans-serif;
   font-size: 12px;
 }

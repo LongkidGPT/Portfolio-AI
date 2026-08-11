@@ -33,3 +33,19 @@ test("the shared-link site opts out of search indexing", async () => {
   );
   assert.match(robots, /User-agent:\s*\*[\s\S]*Disallow:\s*\//);
 });
+
+test("Netlify separates immutable build assets from replaceable media", async () => {
+  const config = await readFile(
+    new URL("../netlify.toml", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    config,
+    /for\s*=\s*"\/_app\/\*"[\s\S]*Cache-Control\s*=\s*"public, max-age=31536000, immutable"/,
+  );
+  assert.match(
+    config,
+    /for\s*=\s*"\/assets\/\*"[\s\S]*Cache-Control\s*=\s*"public, max-age=3600, stale-while-revalidate=86400"/,
+  );
+});

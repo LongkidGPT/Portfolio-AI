@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { resolvePointerLight } from "./hero-parallax.js";
 
@@ -8,47 +8,48 @@ const INITIAL_LIGHT = {
   scale: 0.96,
   opacity: 0,
 };
+const LIGHT_SETTLE_EPSILON = 0.001;
+const ACTIVE_HERO_STATES =
+  ".hero--resolving, .hero--revealed, .hero--released";
 
-export function PointerLight() {
+function ActivePointerLight() {
   const lightRef = useRef(null);
 
   useEffect(() => {
     const light = lightRef.current;
     if (!light) return undefined;
 
-    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
-    const reducedMotionQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    );
     const target = { ...INITIAL_LIGHT };
     const current = { ...INITIAL_LIGHT };
-    const hero = document.querySelector(".hero");
     let previousPointer = null;
     let animationFrameId = 0;
-    let enabled = false;
-    let titleEntered = Boolean(
-      hero?.matches(".hero--resolving, .hero--revealed, .hero--released"),
-    );
-
-    const updateVisibility = () => {
-      target.opacity =
-        enabled && titleEntered && previousPointer ? 0.8 : 0;
-    };
 
     const render = () => {
+      let unsettled = false;
+
       for (const key of Object.keys(current)) {
-        current[key] += (target[key] - current[key]) * 0.18;
+        const difference = target[key] - current[key];
+        current[key] += difference * 0.18;
+        unsettled ||= Math.abs(difference) > LIGHT_SETTLE_EPSILON;
       }
 
       light.style.setProperty("--pointer-x", `${current.x}px`);
       light.style.setProperty("--pointer-y", `${current.y}px`);
       light.style.setProperty("--pointer-scale", current.scale);
       light.style.setProperty("--pointer-opacity", current.opacity);
+
+      animationFrameId = unsettled
+        ? window.requestAnimationFrame(render)
+        : 0;
+    };
+
+    const requestRender = () => {
+      if (animationFrameId !== 0) return;
       animationFrameId = window.requestAnimationFrame(render);
     };
 
     const handlePointerMove = (event) => {
-      if (!enabled || event.pointerType === "touch") return;
+      if (event.pointerType === "touch") return;
 
       const now = performance.now();
       if (!previousPointer) {
@@ -69,60 +70,35 @@ export function PointerLight() {
       target.x = event.clientX;
       target.y = event.clientY;
       target.scale = response.scale;
+      target.opacity = 0.8;
       previousPointer = {
         clientX: event.clientX,
         clientY: event.clientY,
         time: now,
       };
-      updateVisibility();
+      requestRender();
     };
 
     const hideLight = () => {
       target.opacity = 0;
       previousPointer = null;
+      requestRender();
     };
 
-    const updateMode = () => {
-      enabled =
-        !coarsePointerQuery.matches && !reducedMotionQuery.matches;
-      if (!enabled) {
-        current.opacity = 0;
-        light.style.setProperty("--pointer-opacity", 0);
-      }
-      updateVisibility();
-    };
-
-    const heroObserver = new window.MutationObserver(() => {
-      titleEntered = Boolean(
-        hero?.matches(".hero--resolving, .hero--revealed, .hero--released"),
-      );
-      updateVisibility();
-    });
-
-    if (hero) {
-      heroObserver.observe(hero, {
-        attributes: true,
-        attributeFilter: ["class"],
-      });
-    }
-
-    coarsePointerQuery.addEventListener("change", updateMode);
-    reducedMotionQuery.addEventListener("change", updateMode);
     window.addEventListener("pointermove", handlePointerMove, {
       passive: true,
     });
     window.addEventListener("blur", hideLight);
+    document.addEventListener("visibilitychange", hideLight);
     document.documentElement.addEventListener("mouseleave", hideLight);
-    updateMode();
-    animationFrameId = window.requestAnimationFrame(render);
 
     return () => {
-      window.cancelAnimationFrame(animationFrameId);
-      heroObserver.disconnect();
-      coarsePointerQuery.removeEventListener("change", updateMode);
-      reducedMotionQuery.removeEventListener("change", updateMode);
+      if (animationFrameId !== 0) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("blur", hideLight);
+      document.removeEventListener("visibilitychange", hideLight);
       document.documentElement.removeEventListener(
         "mouseleave",
         hideLight,
@@ -134,9 +110,10 @@ export function PointerLight() {
     <img
       ref={lightRef}
       className="pointer-light"
-      src="/assets/pointer-light-02.png"
+      src="/assets/pointer-light-02.webp"
       alt=""
       aria-hidden="true"
+      decoding="async"
       style={{
         "--pointer-x": "0px",
         "--pointer-y": "0px",
@@ -148,4 +125,44 @@ export function PointerLight() {
       }
     />
   );
+}
+
+export function PointerLight() {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    const hero = document.querySelector(".hero");
+
+    const updateMode = () => {
+      setEnabled(
+        !coarsePointerQuery.matches &&
+          !reducedMotionQuery.matches &&
+          Boolean(hero?.matches(ACTIVE_HERO_STATES)),
+      );
+    };
+
+    const heroObserver = new window.MutationObserver(updateMode);
+    if (hero) {
+      heroObserver.observe(hero, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
+
+    coarsePointerQuery.addEventListener("change", updateMode);
+    reducedMotionQuery.addEventListener("change", updateMode);
+    updateMode();
+
+    return () => {
+      heroObserver.disconnect();
+      coarsePointerQuery.removeEventListener("change", updateMode);
+      reducedMotionQuery.removeEventListener("change", updateMode);
+    };
+  }, []);
+
+  return enabled ? <ActivePointerLight /> : null;
 }

@@ -78,6 +78,9 @@ function installDom({
   }
 
   return {
+    pendingAnimationFrames() {
+      return frames.size;
+    },
     stepAnimationFrame() {
       const pending = [...frames.values()];
       frames.clear();
@@ -136,17 +139,18 @@ test("pointer light follows viewport coordinates outside Hero", async () => {
 
 test("pointer light waits for the Hero title and settles at eighty percent opacity", async () => {
   const environment = installDom({ heroState: "ready" });
-  const { root, light } = await renderLight();
+  const { root } = await renderLight();
 
   try {
+    assert.equal(document.querySelector(".pointer-light"), null);
     dispatchPointer(320, 240);
-    for (let index = 0; index < 60; index += 1) {
-      environment.stepAnimationFrame();
-    }
-    assert.equal(light.style.getPropertyValue("--pointer-opacity"), "0");
 
     document.querySelector(".hero").className = "hero hero--resolving";
     await act(async () => Promise.resolve());
+    const light = document.querySelector(".pointer-light");
+    assert.ok(light);
+
+    dispatchPointer(320, 240);
     for (let index = 0; index < 60; index += 1) {
       environment.stepAnimationFrame();
     }
@@ -168,7 +172,7 @@ test("pointer light is decorative and cannot intercept clicks", async () => {
     assert.equal(light.getAttribute("aria-hidden"), "true");
     assert.equal(light.getAttribute("alt"), "");
     assert.equal(light.className, "pointer-light");
-    assert.equal(light.getAttribute("src"), "/assets/pointer-light-02.png");
+    assert.equal(light.getAttribute("src"), "/assets/pointer-light-02.webp");
   } finally {
     await cleanup(root, environment);
   }
@@ -180,17 +184,30 @@ test("coarse pointer and reduced motion keep the light hidden", async () => {
     { coarse: false, reducedMotion: true },
   ]) {
     const environment = installDom(options);
-    const { root, light } = await renderLight();
+    const { root } = await renderLight();
 
     try {
       dispatchPointer(320, 240);
       environment.stepAnimationFrame();
-      assert.equal(
-        light.style.getPropertyValue("--pointer-opacity"),
-        "0",
-      );
+      assert.equal(document.querySelector(".pointer-light"), null);
+      assert.equal(environment.pendingAnimationFrames(), 0);
     } finally {
       await cleanup(root, environment);
     }
+  }
+});
+
+test("pointer light stops requesting frames after it settles", async () => {
+  const environment = installDom();
+  const { root } = await renderLight();
+
+  try {
+    dispatchPointer(320, 240);
+    for (let index = 0; index < 120; index += 1) {
+      environment.stepAnimationFrame();
+    }
+    assert.equal(environment.pendingAnimationFrames(), 0);
+  } finally {
+    await cleanup(root, environment);
   }
 });

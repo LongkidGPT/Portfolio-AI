@@ -21,7 +21,7 @@ function readLossyWebpDimensions(buffer) {
 const homepageImages = [
   "/public/assets/hero-first-frame.webp",
   "/public/assets/hero-poster.webp",
-  "/public/assets/pointer-light-02.png",
+  "/public/assets/pointer-light-02.webp",
   "/public/assets/contact-bg.webp",
   "/public/assets/fonts/mont-extralight.otf",
   "/public/assets/fonts/inter-variable.woff2",
@@ -47,6 +47,17 @@ test("homepage media derivatives exist within delivery budgets", async () => {
   assert.ok(
     videoSize <= 6 * 1024 * 1024,
     `hero video is ${(videoSize / 1024 / 1024).toFixed(2)} MiB`,
+  );
+});
+
+test("pointer light derivative stays below its critical-load budget", async () => {
+  const { size } = await stat(
+    repoFile("/public/assets/pointer-light-02.webp"),
+  );
+
+  assert.ok(
+    size <= 200 * 1024,
+    `pointer light is ${(size / 1024).toFixed(0)} KiB`,
   );
 });
 
