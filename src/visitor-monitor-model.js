@@ -7,6 +7,7 @@ const EMPTY_SESSION = {
   active: false,
   events: [],
   heatmap: {},
+  cases: {},
 };
 
 export function buildVisitorMonitorModel({
@@ -23,17 +24,21 @@ export function buildVisitorMonitorModel({
     snapshot.sessions[0] ??
     EMPTY_SESSION;
 
+  const exposeVisitorId = (session) => ({
+    ...session,
+    visitorLabel: isOwner
+      ? (session.visitorId || "guest").toUpperCase()
+      : "VISITOR",
+  });
+
   return {
     masked: mode === "blurred",
     maskLabel: mode === "blurred" ? "DATA MASKED" : null,
-    sessions: snapshot.sessions.map((session) => ({
-      ...session,
-      visitorLabel: "VISITOR",
-    })),
+    sessions: snapshot.sessions.map(exposeVisitorId),
     current:
       current.id === "empty"
         ? current
-        : { ...current, visitorLabel: "VISITOR" },
+        : exposeVisitorId(current),
     modeAction: isOwner
       ? mode === "open"
         ? { label: "HIDE DATA", nextMode: "blurred" }

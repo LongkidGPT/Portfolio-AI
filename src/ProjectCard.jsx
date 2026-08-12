@@ -46,6 +46,7 @@ export function ProjectCard({ project, onOpenCase }) {
       type="button"
       aria-label={`${project.title}，查看项目`}
       data-track-label={project.title}
+      data-project-id={project.id}
       onClick={() => onOpenCase(project.caseId)}
       onPointerEnter={requestHoverArtwork}
       onFocus={requestHoverArtwork}

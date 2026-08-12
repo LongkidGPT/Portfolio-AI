@@ -98,6 +98,30 @@ function HeatGrid({ heatmap, sections }) {
   );
 }
 
+function CaseReading({ cases = {} }) {
+  const projects = Object.values(cases);
+  return (
+    <div className="visitor-monitor__cases">
+      <span className="visitor-monitor__eyebrow">CASE READING</span>
+      {projects.length ? projects.map((project) => (
+        <div className="visitor-monitor__case" key={project.id}>
+          <div><strong>{project.label}</strong><span>{project.clicks} CLICKS</span></div>
+          <div className="visitor-monitor__case-metrics">
+            <span>DWELL {(project.activeDwellMs / 1000).toFixed(0)}S</span>
+            <span>DEPTH {project.maxDepth}%</span>
+          </div>
+          <div className="visitor-monitor__case-heat" aria-label={`${project.label} 案例阅读热区`}>
+            {(project.segmentDwellMs ?? Array(12).fill(0)).map((value, index, values) => {
+              const maximum = Math.max(1, ...values);
+              return <i key={index} style={{ "--case-heat": Math.max(0.035, value / maximum) }} />;
+            })}
+          </div>
+        </div>
+      )) : <p className="visitor-monitor__empty">NO CASE OPENED</p>}
+    </div>
+  );
+}
+
 export function VisitorMonitorView({
   mode,
   snapshot,
@@ -107,6 +131,8 @@ export function VisitorMonitorView({
   onToggleExpanded,
   onModeChange,
   onSelectSession,
+  cloudStatus = "loading",
+  branchId = "portfolio-home",
 }) {
   const model = useMemo(
     () =>
@@ -152,10 +178,16 @@ export function VisitorMonitorView({
 
       {expanded && (
         <div className="visitor-monitor__body">
+          {cloudStatus !== "ready" && (
+            <div className={`visitor-monitor__cloud visitor-monitor__cloud--${cloudStatus}`}>
+              <strong>{cloudStatus === "loading" ? "CONNECTING POSTHOG" : "LOCAL SIGNAL ONLY"}</strong>
+              <span>{cloudStatus === "loading" ? "SYNCING JOB-PAGE HISTORY" : "PORTFOLIO AI ANALYTICS IS NOT CONFIGURED"}</span>
+            </div>
+          )}
           <div className="visitor-monitor__private">
             <div className="visitor-monitor__overview">
               <div>
-                <span>CURRENT SESSION</span>
+                <span>{branchId.toUpperCase()} · CURRENT SESSION</span>
                 <strong>
                   {current.visitorLabel}
                   <small> / VISIT {String(current.visitNumber).padStart(2, "0")}</small>
@@ -194,6 +226,8 @@ export function VisitorMonitorView({
               heatmap={current.heatmap}
               sections={current.sections ?? []}
             />
+
+            <CaseReading cases={current.cases} />
 
             <div className="visitor-monitor__timeline">
               <span className="visitor-monitor__eyebrow">CLICK ACTIVITY</span>

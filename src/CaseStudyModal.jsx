@@ -10,6 +10,7 @@ import {
   handleCaseStudyKeyDown,
   nextSliceRetryState,
 } from "./case-study-model.js";
+import { getPortfolioAnalytics } from "./posthog-analytics.js";
 
 export function CaseStudyModal({
   caseId,
@@ -23,11 +24,61 @@ export function CaseStudyModal({
   const summaryId = "case-study-summary";
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const caseViewIdRef = useRef(null);
   const [sliceStates, setSliceStates] = useState({});
 
   useEffect(() => {
     setSliceStates({});
+    caseViewIdRef.current = caseId
+      ? (globalThis.crypto?.randomUUID?.() ?? `${caseId}-${Date.now()}`)
+      : null;
   }, [caseId]);
+
+  useEffect(() => {
+    if (!caseStudy || !modalRef.current) return undefined;
+    const scroller = modalRef.current;
+    const analytics = getPortfolioAnalytics();
+    const dwell = Array.from({ length: 12 }, () => 0);
+    let lastSampleAt = performance.now();
+    let activeDwellMs = 0;
+    let maxDepth = 0;
+
+    const sample = () => {
+      const now = performance.now();
+      const elapsed = document.visibilityState === "hidden" ? 0 : now - lastSampleAt;
+      lastSampleAt = now;
+      activeDwellMs += elapsed;
+      const scrollable = Math.max(scroller.scrollHeight - scroller.clientHeight, 1);
+      const depth = Math.min(100, Math.round((scroller.scrollTop / scrollable) * 100));
+      maxDepth = Math.max(maxDepth, depth);
+      const center = scroller.scrollTop + scroller.clientHeight / 2;
+      const segment = Math.min(11, Math.max(0, Math.floor((center / Math.max(scroller.scrollHeight, 1)) * 12)));
+      dwell[segment] += elapsed;
+    };
+    const report = () => {
+      sample();
+      analytics.capture("portfolio_case_progress", {
+        project_id: caseStudy.id,
+        project_label: title,
+        case_view_id: caseViewIdRef.current,
+        max_scroll_depth: maxDepth,
+        active_dwell_ms: Math.round(activeDwellMs),
+        segment_dwell_ms: dwell.map(Math.round),
+      });
+    };
+    const onScroll = () => sample();
+    const onVisibility = () => sample();
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
+    const heartbeat = window.setInterval(report, 15_000);
+    report();
+    return () => {
+      report();
+      scroller.removeEventListener("scroll", onScroll);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.clearInterval(heartbeat);
+    };
+  }, [caseStudy, title]);
 
   useEffect(() => {
     if (!caseStudy) return undefined;

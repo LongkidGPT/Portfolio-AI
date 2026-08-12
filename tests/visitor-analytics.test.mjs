@@ -105,7 +105,7 @@ test("events update only their own visit and preserve the earlier history", () =
   assert.deepEqual(sessions[1], older);
 });
 
-test("monitor snapshot anonymizes recipient ids and identifies recent activity", () => {
+test("monitor snapshot preserves recipient ids for the owner model and identifies recent activity", () => {
   const first = {
     ...createSession({
       id: "session-01",
@@ -128,7 +128,7 @@ test("monitor snapshot anonymizes recipient ids and identifies recent activity",
     snapshot.sessions.map((session) => session.visitorLabel),
     ["VISITOR 01", "VISITOR 02"],
   );
-  assert.equal(JSON.stringify(snapshot).includes("anker-hr"), false);
+  assert.equal(snapshot.sessions[0].visitorId, "anker-hr-a8f3");
 });
 
 test("heartbeat keeps a visit online without polluting its visible timeline", () => {

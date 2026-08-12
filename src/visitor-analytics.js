@@ -20,6 +20,7 @@ export function createSession({ id, visitorId, startedAt }) {
     events: [],
     heatmap: {},
     sections: [],
+    cases: {},
   };
 }
 
@@ -103,7 +104,7 @@ export function getMonitorSnapshot(sessions, now = Date.now()) {
   const visitorLabels = new Map();
 
   for (const session of sessions) {
-    if (!visitorLabels.has(session.visitorId)) {
+    if (session.visitorId && !visitorLabels.has(session.visitorId)) {
       visitorLabels.set(
         session.visitorId,
         `VISITOR ${String(visitorLabels.size + 1).padStart(2, "0")}`,
@@ -112,15 +113,17 @@ export function getMonitorSnapshot(sessions, now = Date.now()) {
   }
 
   const visibleSessions = sessions.map((session) => {
-    const visitNumber = sessions.filter(
-      (candidate) =>
+    const visitNumber = session.visitNumber ?? sessions.filter(
+      (candidate) => session.visitorId &&
         candidate.visitorId === session.visitorId &&
         candidate.startedAt <= session.startedAt,
     ).length;
 
     return {
       id: session.id,
-      visitorLabel: visitorLabels.get(session.visitorId),
+      ...(session.visitorId ? { visitorId: session.visitorId } : {}),
+      visitorLabel:
+        session.visitorLabel ?? visitorLabels.get(session.visitorId) ?? "VISITOR",
       visitNumber,
       startedAt: session.startedAt,
       lastSeenAt: session.lastSeenAt,
@@ -130,6 +133,7 @@ export function getMonitorSnapshot(sessions, now = Date.now()) {
       events: session.events,
       heatmap: session.heatmap,
       sections: session.sections ?? [],
+      cases: session.cases ?? {},
       active:
         session.endedAt === null &&
         now - session.lastSeenAt <= ACTIVE_WINDOW_MS,
@@ -139,7 +143,9 @@ export function getMonitorSnapshot(sessions, now = Date.now()) {
   return {
     activeCount: visibleSessions.filter((session) => session.active).length,
     totalSessions: visibleSessions.length,
-    totalVisitors: visitorLabels.size,
+    totalVisitors: new Set(
+      visibleSessions.map((session) => session.visitorId ?? session.visitorLabel),
+    ).size,
     sessions: visibleSessions,
   };
 }

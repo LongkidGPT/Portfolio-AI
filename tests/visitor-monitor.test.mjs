@@ -13,6 +13,7 @@ const snapshot = {
   sessions: [
     {
       id: "session-02",
+      visitorId: "anker-hr-a8f3",
       visitorLabel: "VISITOR 01",
       visitNumber: 2,
       currentSection: "work",
@@ -58,6 +59,7 @@ test("open mode exposes anonymized data while controls remain owner-only", () =>
     label: "HIDE DATA",
     nextMode: "blurred",
   });
+  assert.equal(ownerModel.current.visitorLabel, "ANKER-HR-A8F3");
 });
 
 test("current and history visitor labels are normalized without changing session identity", () => {
