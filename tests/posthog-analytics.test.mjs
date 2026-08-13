@@ -7,6 +7,37 @@ import {
   queryPostHogEvents,
   summarizeBranch,
 } from "../netlify/lib/posthog-analytics.mjs";
+import { createPostHogAnalytics } from "../src/posthog-analytics.js";
+
+test("browser capture uses the current PostHog api_key payload", () => {
+  const values = new Map();
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  };
+  const previousWindow = globalThis.window;
+  globalThis.window = {
+    localStorage: storage,
+    sessionStorage: storage,
+    location: { hostname: "localhost", pathname: "/" },
+  };
+
+  let request;
+  const analytics = createPostHogAnalytics({
+    token: "phc_portfolio",
+    host: "https://us.i.posthog.com",
+    branchId: "portfolio-home",
+    fetcher: (_url, options) => {
+      request = JSON.parse(options.body);
+      return Promise.resolve({ ok: true });
+    },
+  });
+  analytics.capture("portfolio_session_started");
+
+  assert.equal(request.api_key, "phc_portfolio");
+  assert.equal("token" in request, false);
+  globalThis.window = previousWindow;
+});
 
 test("job branch identifiers stay bounded and cannot alter the query", () => {
   assert.equal(isValidBranch("anker-brand"), true);

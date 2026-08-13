@@ -46,7 +46,7 @@ export function createPostHogAnalytics({
   const capture = (event, properties = {}, { beacon = false } = {}) => {
     if (!token || !endpoint) return;
     const body = JSON.stringify({
-      token,
+      api_key: token,
       event,
       timestamp: new Date().toISOString(),
       properties: {
