@@ -43,5 +43,6 @@ test("each project maps to a case and exposes a stable artwork ratio", () => {
 test("experience model matches the five visible career rows", () => {
   assert.equal(experience.length, 5);
   assert.equal(experience[0].company, "安克创新 Anker Innovations");
+  assert.equal(experience[1].period, "2021.06 – 2023.09");
   assert.equal(experience[2].company, "熠思霆创意 Extend");
 });
