@@ -174,7 +174,7 @@ test("desktop project cards preserve the supplied framed artwork proportions", a
       desktop,
       ".project-card:not(.project-card--wide) .project-card__copy strong",
     ),
-    /font-size:\s*clamp\(16px,\s*1\.2vw,\s*22px\)[\s\S]*font-weight:\s*200/,
+    /font-size:\s*clamp\(16px,\s*1\.2vw,\s*22px\)[\s\S]*font-weight:\s*300/,
   );
   assert.match(
     cssDeclarations(
@@ -188,7 +188,7 @@ test("desktop project cards preserve the supplied framed artwork proportions", a
       desktop,
       ".project-card:not(.project-card--wide) .project-card__copy > span",
     ),
-    /font-size:\s*clamp\(11px,\s*0\.82vw,\s*15px\)/,
+    /font-size:\s*clamp\(var\(--text-secondary\),\s*0\.82vw,\s*0\.9375rem\)/,
   );
 
   assert.match(
@@ -487,7 +487,7 @@ test("page typography uses Mont ExtraLight headings and Inter support text", asy
     cssDeclarations(desktop, ":root"),
     /font-family:\s*var\(--font-body\),\s*var\(--font-cjk\),\s*sans-serif/,
   );
-  assert.match(cssDeclarations(desktop, ":root"), /font-weight:\s*200/);
+  assert.match(cssDeclarations(desktop, ":root"), /font-weight:\s*300/);
   assert.match(
     cssDeclarations(desktop, ".approach__intro h2"),
     /font-family:\s*var\(--font-display\),\s*var\(--font-cjk\),\s*sans-serif[\s\S]*font-weight:\s*200[\s\S]*text-transform:\s*uppercase/,

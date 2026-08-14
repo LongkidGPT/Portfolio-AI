@@ -98,7 +98,7 @@ export const footerTagline = activeVariant.footerTagline;
 export const experience = [
   {
     company: "安克创新 Anker Innovations",
-    role: "资深视觉设计师（充电储能品牌线）",
+    role: "资深视觉设计师（充电储能线）",
     period: "2023.12 – 2026.02",
   },
   {

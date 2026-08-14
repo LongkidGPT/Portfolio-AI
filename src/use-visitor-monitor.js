@@ -90,12 +90,21 @@ export function useVisitorMonitor() {
       if (layoutFrame) return;
       layoutFrame = requestAnimationFrame(() => {
         layoutFrame = 0;
-        const height = Math.max(document.documentElement.scrollHeight, innerHeight);
+        const height = Math.max(
+          document.documentElement.scrollHeight,
+          window.innerHeight,
+        );
         store.recordEvent(sessionId, {
           type: "layout", label: "PAGE STRUCTURE", at: Date.now(),
           sections: normalizeSectionLayout(Array.from(document.querySelectorAll("[data-track-section]"), (section) => {
             const bounds = section.getBoundingClientRect();
-            return { id: section.id, label: section.dataset.trackLabel || section.id.toUpperCase(), top: bounds.top + scrollY, height: bounds.height };
+            return {
+              id: section.id,
+              label:
+                section.dataset.trackLabel || section.id.toUpperCase(),
+              top: bounds.top + window.scrollY,
+              height: bounds.height,
+            };
           }), height),
         });
       });
@@ -104,7 +113,17 @@ export function useVisitorMonitor() {
       if (scrollFrame) return;
       scrollFrame = requestAnimationFrame(() => {
         scrollFrame = 0;
-        const depth = Math.min(100, Math.round((scrollY / Math.max(document.documentElement.scrollHeight - innerHeight, 1)) * 100));
+        const depth = Math.min(
+          100,
+          Math.round(
+            (window.scrollY /
+              Math.max(
+                document.documentElement.scrollHeight - window.innerHeight,
+                1,
+              )) *
+              100,
+          ),
+        );
         if (depth <= lastScrollDepth + 2) return;
         lastScrollDepth = depth;
         store.recordEvent(sessionId, { type: "scroll", label: `${depth}% DEPTH`, scrollDepth: depth, at: Date.now() });
@@ -129,9 +148,9 @@ export function useVisitorMonitor() {
 
     document.querySelectorAll("[data-track-section]").forEach((section) => observer.observe(section));
     const heartbeat = setInterval(recordHeartbeat, 15_000);
-    addEventListener("scroll", recordScroll, { passive: true });
-    addEventListener("resize", recordLayout, { passive: true });
-    addEventListener("pagehide", closeSession);
+    window.addEventListener("scroll", recordScroll, { passive: true });
+    window.addEventListener("resize", recordLayout, { passive: true });
+    window.addEventListener("pagehide", closeSession);
     document.addEventListener("click", recordProjectClick);
     document.addEventListener("visibilitychange", visibilityChanged);
     recordScroll(); recordLayout();
@@ -139,7 +158,9 @@ export function useVisitorMonitor() {
       observer.disconnect(); clearInterval(heartbeat);
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
       if (layoutFrame) cancelAnimationFrame(layoutFrame);
-      removeEventListener("scroll", recordScroll); removeEventListener("resize", recordLayout); removeEventListener("pagehide", closeSession);
+      window.removeEventListener("scroll", recordScroll);
+      window.removeEventListener("resize", recordLayout);
+      window.removeEventListener("pagehide", closeSession);
       document.removeEventListener("click", recordProjectClick); document.removeEventListener("visibilitychange", visibilityChanged);
     };
   }, [analytics, store]);
