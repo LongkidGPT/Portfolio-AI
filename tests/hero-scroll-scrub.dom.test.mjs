@@ -589,7 +589,7 @@ test("enabling reduced motion after mount releases one-way and removes its liste
   }
 });
 
-test("mounted Hero content is inert while hidden and interactive after release", async () => {
+test("mounted Hero content is immediately readable while media remains progressive", async () => {
   const environment = installDom({
     mediaMatches: { "(pointer: coarse)": true },
     styles: heroStyles,
@@ -604,16 +604,16 @@ test("mounted Hero content is inert while hidden and interactive after release",
     const content = document.querySelector(".hero__content");
     assert.equal(
       document.querySelector(".hero__video").getAttribute("preload"),
-      "auto",
+      "metadata",
     );
     assert.equal(
       document.querySelector(".hero__cycle-scene"),
       null,
       "disabled spatial view must not mount or request the cycle video",
     );
-    assert.ok(content.hasAttribute("inert"));
-    assert.equal(content.getAttribute("aria-hidden"), "true");
-    assert.equal(getComputedStyle(content).pointerEvents, "none");
+    assert.equal(content.hasAttribute("inert"), false);
+    assert.equal(content.hasAttribute("aria-hidden"), false);
+    assert.equal(getComputedStyle(content).pointerEvents, "auto");
 
     await act(async () => {
       document

@@ -99,6 +99,14 @@ function ModalHarness({ onClose }) {
   const selectedProject = projects.find(
     (project) => project.id === selectedCaseId,
   );
+  const selectedIndex = projects.findIndex(
+    (project) => project.id === selectedCaseId,
+  );
+  const previousProject = selectedIndex > 0 ? projects[selectedIndex - 1] : null;
+  const nextProject =
+    selectedIndex >= 0 && selectedIndex < projects.length - 1
+      ? projects[selectedIndex + 1]
+      : null;
 
   const openCase = (event, caseId) => {
     returnFocusRef.current = event.currentTarget;
@@ -134,6 +142,9 @@ function ModalHarness({ onClose }) {
       onClose: closeCase,
       returnFocusRef,
       title: selectedProject?.title ?? "",
+      previousProject,
+      nextProject,
+      onSelectCase: setSelectedCaseId,
     }),
   );
 }
@@ -212,15 +223,19 @@ test("rendered modal traps Tab in its controls and retries a failed image with a
 
     const retryButton = document.querySelector(".case-study__retry");
     const closeButton = document.querySelector("[aria-label='关闭案例']");
+    const lastButton = document.querySelector(
+      "[aria-label^='查看下一个案例']",
+    );
     assert.ok(retryButton);
+    assert.ok(lastButton);
 
-    retryButton.focus();
+    lastButton.focus();
     await act(async () => keydown("Tab"));
     assert.equal(document.activeElement, closeButton);
 
     closeButton.focus();
     await act(async () => keydown("Tab", { shiftKey: true }));
-    assert.equal(document.activeElement, retryButton);
+    assert.equal(document.activeElement, lastButton);
 
     await act(async () => click(retryButton));
     assert.equal(

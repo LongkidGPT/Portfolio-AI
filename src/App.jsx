@@ -25,6 +25,15 @@ export function App() {
   const selectedProject = projects.find(
     (project) => project.id === selectedCaseId,
   );
+  const selectedProjectIndex = projects.findIndex(
+    (project) => project.id === selectedCaseId,
+  );
+  const previousProject =
+    selectedProjectIndex > 0 ? projects[selectedProjectIndex - 1] : null;
+  const nextProject =
+    selectedProjectIndex >= 0 && selectedProjectIndex < projects.length - 1
+      ? projects[selectedProjectIndex + 1]
+      : null;
   const handleOpenCase = useCallback((caseId) => {
     returnFocusRef.current = document.activeElement;
     setSelectedCaseId(caseId);
@@ -107,6 +116,9 @@ export function App() {
         onClose={handleCloseCase}
         backgroundRef={backgroundRef}
         returnFocusRef={returnFocusRef}
+        previousProject={previousProject}
+        nextProject={nextProject}
+        onSelectCase={setSelectedCaseId}
       />
     </>
   );

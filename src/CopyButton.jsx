@@ -9,6 +9,7 @@ export function CopyButton({
   copiedLabel,
   className,
   trackLabel,
+  actionLabel,
   showArrow = false,
   onAnimationEnd,
 }) {
@@ -45,6 +46,7 @@ export function CopyButton({
       onClick={handleCopy}
       onAnimationEnd={onAnimationEnd}
       aria-live="polite"
+      aria-label={copyState === "idle" ? actionLabel : visibleLabel}
     >
       {visibleLabel}
       {copyState === "copied" ? (

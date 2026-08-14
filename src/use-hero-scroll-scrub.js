@@ -54,7 +54,7 @@ export function useHeroScrollScrub({ videoRef }) {
   }, [publish]);
 
   const releaseHero = useCallback(() => {
-    if (modelRef.current.state === HERO_STATES.REVEALED) {
+    if (modelRef.current.state !== HERO_STATES.RELEASED) {
       publish({ state: HERO_STATES.RELEASED, progress: 1 });
     }
   }, [publish]);

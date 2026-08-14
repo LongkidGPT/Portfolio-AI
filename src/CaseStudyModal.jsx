@@ -18,17 +18,23 @@ export function CaseStudyModal({
   onClose,
   backgroundRef,
   returnFocusRef,
+  previousProject,
+  nextProject,
+  onSelectCase,
 }) {
   const caseStudy = getCaseStudy(caseStudies, caseId);
   const accessibility = getCaseStudyAccessibility(title);
   const summaryId = "case-study-summary";
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const summaryRef = useRef(null);
+  const visualsRef = useRef(null);
   const caseViewIdRef = useRef(null);
   const [sliceStates, setSliceStates] = useState({});
 
   useEffect(() => {
     setSliceStates({});
+    modalRef.current?.scrollTo?.({ top: 0 });
     caseViewIdRef.current = caseId
       ? (globalThis.crypto?.randomUUID?.() ?? `${caseId}-${Date.now()}`)
       : null;
@@ -118,6 +124,13 @@ export function CaseStudyModal({
     }));
   };
 
+  const jumpTo = (targetRef) => {
+    targetRef.current?.scrollIntoView?.({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <div
       ref={modalRef}
@@ -129,22 +142,6 @@ export function CaseStudyModal({
       onClick={handleBackdropClick}
     >
       <div className="case-study__document">
-        <h2
-          className="case-study__heading"
-          id={accessibility.titleId}
-        >
-          {accessibility.title}
-        </h2>
-        <div className="case-study__summary" id={summaryId}>
-          <dl>
-            <dt>项目背景</dt>
-            <dd>{caseStudy.summary.background}</dd>
-            <dt>我的职责</dt>
-            <dd>{caseStudy.summary.responsibility}</dd>
-            <dt>项目成果</dt>
-            <dd>{caseStudy.summary.outcome}</dd>
-          </dl>
-        </div>
         <button
           ref={closeButtonRef}
           className="case-study__close"
@@ -154,6 +151,44 @@ export function CaseStudyModal({
         >
           关闭 ×
         </button>
+        <header className="case-study__overview" ref={summaryRef}>
+          <p className="case-study__eyebrow">PROJECT OVERVIEW</p>
+          <h2
+            className="case-study__heading"
+            id={accessibility.titleId}
+          >
+            {accessibility.title}
+          </h2>
+          <nav className="case-study__toc" aria-label="案例章节">
+            <button type="button" onClick={() => jumpTo(summaryRef)}>
+              Overview
+            </button>
+            <button type="button" onClick={() => jumpTo(visualsRef)}>
+              Visual Story
+            </button>
+          </nav>
+          <div className="case-study__summary" id={summaryId}>
+            <dl>
+              <div>
+                <dt>项目背景</dt>
+                <dd>{caseStudy.summary.background}</dd>
+              </div>
+              <div>
+                <dt>我的职责</dt>
+                <dd>{caseStudy.summary.responsibility}</dd>
+              </div>
+              <div>
+                <dt>项目成果</dt>
+                <dd>{caseStudy.summary.outcome}</dd>
+              </div>
+            </dl>
+          </div>
+        </header>
+        <div
+          className="case-study__visuals"
+          ref={visualsRef}
+          aria-label="案例视觉展示"
+        >
         {!sliceStates[0]?.loaded && !sliceStates[0]?.error && (
           <div className="case-study__loading" role="status">
             正在加载案例
@@ -212,6 +247,40 @@ export function CaseStudyModal({
             </div>
           );
         })}
+        </div>
+        <nav className="case-study__pager" aria-label="案例切换">
+          {previousProject ? (
+            <button
+              type="button"
+              onClick={() => onSelectCase(previousProject.caseId)}
+              aria-label={`查看上一个案例：${previousProject.title}`}
+            >
+              <span>PREVIOUS</span>
+              <strong>{previousProject.title}</strong>
+            </button>
+          ) : (
+            <span aria-hidden="true" />
+          )}
+          <button
+            className="case-study__overview-return"
+            type="button"
+            onClick={onClose}
+          >
+            返回作品概览
+          </button>
+          {nextProject ? (
+            <button
+              type="button"
+              onClick={() => onSelectCase(nextProject.caseId)}
+              aria-label={`查看下一个案例：${nextProject.title}`}
+            >
+              <span>NEXT</span>
+              <strong>{nextProject.title}</strong>
+            </button>
+          ) : (
+            <span aria-hidden="true" />
+          )}
+        </nav>
       </div>
     </div>
   );

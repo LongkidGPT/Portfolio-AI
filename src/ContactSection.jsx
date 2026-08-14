@@ -32,6 +32,7 @@ export function ContactSection() {
           label="start a conversation"
           copiedLabel="已复制邮箱"
           trackLabel="start a conversation"
+          actionLabel="复制邮箱地址"
           showArrow
         />
       </div>

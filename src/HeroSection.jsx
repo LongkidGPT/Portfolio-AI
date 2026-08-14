@@ -1,5 +1,5 @@
 import { ArrowDown } from "@phosphor-icons/react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CopyButton } from "./CopyButton.jsx";
 import { heroFeatures } from "./hero-features.js";
@@ -13,6 +13,7 @@ export function HeroSection() {
   const videoRef = useRef(null);
   const cycleVideoRef = useRef(null);
   const [typewriterComplete, setTypewriterComplete] = useState(false);
+  const [videoSource, setVideoSource] = useState(null);
   const cycleEnabled = heroFeatures.cycleSpatialView;
   const {
     heroState,
@@ -31,28 +32,38 @@ export function HeroSection() {
     [],
   );
 
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return undefined;
+    }
+
+    const loadVideo = () => setVideoSource("/assets/hero-bg-optimized.mp4");
+    let timeoutId;
+    let idleId;
+
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(loadVideo, { timeout: 900 });
+    } else {
+      timeoutId = window.setTimeout(loadVideo, 360);
+    }
+
+    return () => {
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (heroState !== "resolving") return undefined;
+    const timerId = window.setTimeout(completeReveal, 1650);
+    return () => window.clearTimeout(timerId);
+  }, [completeReveal, heroState]);
+
   const handleHeroNavigation = (event) => {
     const anchor = event.target.closest("a[href^='#']");
     if (!anchor || anchor.getAttribute("href") === "#hero") return;
-
-    if (["ready", "scrubbing", "resolving"].includes(heroState)) {
-      event.preventDefault();
-      return;
-    }
-
-    if (heroState === "revealed") {
-      releaseHero();
-    }
+    releaseHero();
   };
-
-  const handleRevealAnimationEnd = (event) => {
-    if (event.animationName === "hero-wechat-in") {
-      completeReveal();
-    }
-  };
-  const contentIsHidden = ["ready", "scrubbing", "resolving"].includes(
-    heroState,
-  );
 
   return (
     <section
@@ -68,11 +79,11 @@ export function HeroSection() {
         <video
           ref={videoRef}
           className="hero__video"
-          src="/assets/hero-bg-optimized.mp4"
+          src={videoSource ?? undefined}
           poster="/assets/hero-first-frame.webp"
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           onError={failMedia}
         />
         <img
@@ -122,15 +133,9 @@ export function HeroSection() {
         </a>
       </nav>
 
-      <div
-        className="hero__content"
-        inert={contentIsHidden ? true : undefined}
-        aria-hidden={contentIsHidden ? true : undefined}
-      >
+      <div className="hero__content">
         <HeroTypewriter
-          active={["resolving", "revealed", "released"].includes(
-            heroState,
-          )}
+          active
           onComplete={completeTypewriter}
         />
         <p>{heroSubtitle}</p>
@@ -145,7 +150,6 @@ export function HeroSection() {
             label="Wechat: LKchat1980"
             copiedLabel="已复制微信号"
             trackLabel="Wechat: LKchat1980"
-            onAnimationEnd={handleRevealAnimationEnd}
           />
         </div>
       </div>
