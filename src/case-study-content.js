@@ -1,4 +1,6 @@
-export const caseStudyContent = {
+import { activeVariant } from "./variants/active.js";
+
+const defaultCaseStudyContent = {
   brand: {
     summary: {
       background: "多品牌全球化扩张需要统一、清晰且可执行的视觉语言。",
@@ -21,3 +23,13 @@ export const caseStudyContent = {
     },
   },
 };
+
+export const caseStudyContent = Object.fromEntries(
+  Object.entries(defaultCaseStudyContent).map(([id, content]) => [
+    id,
+    {
+      ...content,
+      summary: activeVariant.caseStudySummary?.[id] ?? content.summary,
+    },
+  ]),
+);

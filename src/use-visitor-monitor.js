@@ -129,9 +129,9 @@ export function useVisitorMonitor() {
 
     document.querySelectorAll("[data-track-section]").forEach((section) => observer.observe(section));
     const heartbeat = setInterval(recordHeartbeat, 15_000);
-    addEventListener("scroll", recordScroll, { passive: true });
-    addEventListener("resize", recordLayout, { passive: true });
-    addEventListener("pagehide", closeSession);
+    window.addEventListener("scroll", recordScroll, { passive: true });
+    window.addEventListener("resize", recordLayout, { passive: true });
+    window.addEventListener("pagehide", closeSession);
     document.addEventListener("click", recordProjectClick);
     document.addEventListener("visibilitychange", visibilityChanged);
     recordScroll(); recordLayout();
@@ -139,7 +139,7 @@ export function useVisitorMonitor() {
       observer.disconnect(); clearInterval(heartbeat);
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
       if (layoutFrame) cancelAnimationFrame(layoutFrame);
-      removeEventListener("scroll", recordScroll); removeEventListener("resize", recordLayout); removeEventListener("pagehide", closeSession);
+      window.removeEventListener("scroll", recordScroll); window.removeEventListener("resize", recordLayout); window.removeEventListener("pagehide", closeSession);
       document.removeEventListener("click", recordProjectClick); document.removeEventListener("visibilitychange", visibilityChanged);
     };
   }, [analytics, store]);
