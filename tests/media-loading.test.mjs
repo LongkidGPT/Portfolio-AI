@@ -37,7 +37,7 @@ test("homepage media derivatives exist within delivery budgets", async () => {
   );
   const imageTotal = imageSizes.reduce((total, size) => total + size, 0);
   const { size: videoSize } = await stat(
-    repoFile("/public/assets/hero-bg-optimized.mp4"),
+    repoFile("/public/assets/hero-bg-scrub-720.mp4"),
   );
 
   assert.ok(
@@ -45,7 +45,7 @@ test("homepage media derivatives exist within delivery budgets", async () => {
     `homepage images total ${(imageTotal / 1024 / 1024).toFixed(2)} MiB`,
   );
   assert.ok(
-    videoSize <= 6 * 1024 * 1024,
+    videoSize <= 3.25 * 1024 * 1024,
     `hero video is ${(videoSize / 1024 / 1024).toFixed(2)} MiB`,
   );
 });

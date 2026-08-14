@@ -161,7 +161,7 @@ function installDom({ mediaMatches = {}, styles = "" } = {}) {
   };
 }
 
-function createFakeVideo({ videoFrameCallback = true } = {}) {
+function createFakeVideo({ videoFrameCallback = true, readyState = 4 } = {}) {
   const video = new window.EventTarget();
   const frameCallbacks = new Map();
   const seekTimes = [];
@@ -170,7 +170,7 @@ function createFakeVideo({ videoFrameCallback = true } = {}) {
 
   Object.assign(video, {
     duration: 8,
-    readyState: 4,
+    readyState,
     pause() {},
   });
   Object.defineProperty(video, "currentTime", {
@@ -318,6 +318,41 @@ test("scrub seeks stay on 24fps frame boundaries and serialize the latest target
     assert.ok(latestSeek > firstSeek);
     assert.equal(Number.isInteger(latestSeek * 24), true);
     assert.equal(fakeVideo.pendingFrameCount(), 1);
+  } finally {
+    await cleanupHarness(harness.root, environment);
+  }
+});
+
+test("native scrolling remains available until the scrub video can display frames", async () => {
+  const environment = installDom();
+  const fakeVideo = createFakeVideo({ readyState: 0 });
+  const harness = await renderScrubHarness(fakeVideo.video);
+
+  try {
+    let loadingWheel;
+    await act(async () => {
+      loadingWheel = dispatchWheel();
+      environment.stepAnimationFrame();
+    });
+
+    assert.equal(loadingWheel.defaultPrevented, false);
+    assert.equal(harness.state(), "ready");
+    assert.equal(fakeVideo.seekTimes.length, 1, "mount should only reset to frame zero");
+
+    fakeVideo.video.readyState = 4;
+    await act(async () => {
+      fakeVideo.video.dispatchEvent(new window.Event("loadeddata"));
+    });
+
+    let readyWheel;
+    await act(async () => {
+      readyWheel = dispatchWheel();
+      environment.stepAnimationFrame();
+    });
+
+    assert.equal(readyWheel.defaultPrevented, true);
+    assert.equal(harness.state(), "scrubbing");
+    assert.ok(fakeVideo.seekTimes.at(-1) > 0);
   } finally {
     await cleanupHarness(harness.root, environment);
   }
@@ -604,7 +639,11 @@ test("mounted Hero content is immediately readable while media remains progressi
     const content = document.querySelector(".hero__content");
     assert.equal(
       document.querySelector(".hero__video").getAttribute("preload"),
-      "metadata",
+      "auto",
+    );
+    assert.equal(
+      document.querySelector(".hero__video").getAttribute("src"),
+      "/assets/hero-bg-scrub-720.mp4",
     );
     assert.equal(
       document.querySelector(".hero__cycle-scene"),

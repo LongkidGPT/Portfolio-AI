@@ -13,7 +13,6 @@ export function HeroSection() {
   const videoRef = useRef(null);
   const cycleVideoRef = useRef(null);
   const [typewriterComplete, setTypewriterComplete] = useState(false);
-  const [videoSource, setVideoSource] = useState(null);
   const cycleEnabled = heroFeatures.cycleSpatialView;
   const {
     heroState,
@@ -31,27 +30,6 @@ export function HeroSection() {
     () => setTypewriterComplete(true),
     [],
   );
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return undefined;
-    }
-
-    const loadVideo = () => setVideoSource("/assets/hero-bg-optimized.mp4");
-    let timeoutId;
-    let idleId;
-
-    if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(loadVideo, { timeout: 900 });
-    } else {
-      timeoutId = window.setTimeout(loadVideo, 360);
-    }
-
-    return () => {
-      if (idleId !== undefined) window.cancelIdleCallback(idleId);
-      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
-    };
-  }, []);
 
   useEffect(() => {
     if (heroState !== "resolving") return undefined;
@@ -79,11 +57,11 @@ export function HeroSection() {
         <video
           ref={videoRef}
           className="hero__video"
-          src={videoSource ?? undefined}
+          src="/assets/hero-bg-scrub-720.mp4"
           poster="/assets/hero-first-frame.webp"
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           onError={failMedia}
         />
         <img

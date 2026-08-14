@@ -108,7 +108,6 @@ export function useHeroScrollScrub({ videoRef }) {
     };
 
     const handleMediaFailure = () => {
-      window.clearTimeout(failureTimerId);
       cancelInFlightSeek();
       failMedia();
     };
@@ -118,13 +117,8 @@ export function useHeroScrollScrub({ videoRef }) {
       seekWatchdogId = window.setTimeout(handleMediaFailure, 4000);
     };
 
-    const handleMetadata = () => {
-      readyRef.current = true;
-    };
-
     const handleReady = () => {
-      handleMetadata();
-      window.clearTimeout(failureTimerId);
+      readyRef.current = video.readyState >= 2;
     };
 
     const handleSeeked = () => {
@@ -135,16 +129,11 @@ export function useHeroScrollScrub({ videoRef }) {
       clearSeekWatchdog();
     };
 
-    const failureTimerId = window.setTimeout(handleMediaFailure, 4000);
-
     const handleReducedMotionChange = (event) => {
       if (!event.matches) return;
       handleMediaFailure();
     };
 
-    if (video.readyState >= 1) {
-      handleMetadata();
-    }
     if (video.readyState >= 2) {
       handleReady();
     }
@@ -155,6 +144,13 @@ export function useHeroScrollScrub({ videoRef }) {
 
       if (released !== current) {
         publish(released);
+        return;
+      }
+
+      if (
+        [HERO_STATES.READY, HERO_STATES.SCRUBBING].includes(current.state) &&
+        !readyRef.current
+      ) {
         return;
       }
 
@@ -207,13 +203,8 @@ export function useHeroScrollScrub({ videoRef }) {
 
     const handleTouchMove = (event) => {
       const touch = event.touches[0];
-      const current = modelRef.current;
 
       if (!touch || !touchPoint) return;
-
-      if (shouldCaptureHeroInput(current.state)) {
-        event.preventDefault();
-      }
 
       const horizontal = Math.abs(touch.clientX - touchPoint.clientX);
       const vertical = Math.abs(touch.clientY - touchPoint.clientY);
@@ -319,7 +310,6 @@ export function useHeroScrollScrub({ videoRef }) {
       }
     };
 
-    video.addEventListener("loadedmetadata", handleMetadata);
     video.addEventListener("loadeddata", handleReady);
     video.addEventListener("canplay", handleReady);
     video.addEventListener("seeked", handleSeeked);
@@ -335,13 +325,11 @@ export function useHeroScrollScrub({ videoRef }) {
 
     return () => {
       disposed = true;
-      window.clearTimeout(failureTimerId);
       clearSeekWatchdog();
       window.cancelAnimationFrame(animationFrameId);
       if (videoFrameId !== null && "cancelVideoFrameCallback" in video) {
         video.cancelVideoFrameCallback(videoFrameId);
       }
-      video.removeEventListener("loadedmetadata", handleMetadata);
       video.removeEventListener("loadeddata", handleReady);
       video.removeEventListener("canplay", handleReady);
       video.removeEventListener("seeked", handleSeeked);

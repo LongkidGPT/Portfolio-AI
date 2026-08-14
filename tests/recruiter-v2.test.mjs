@@ -13,8 +13,9 @@ test("V2 exposes Hero information and navigation before the cinematic sequence c
   assert.doesNotMatch(hero, /contentIsHidden/);
   assert.doesNotMatch(hero, /event\.preventDefault\(\)/);
   assert.match(hero, /<HeroTypewriter\s+active/);
-  assert.match(hero, /preload="metadata"/);
-  assert.match(hero, /requestIdleCallback/);
+  assert.match(hero, /preload="auto"/);
+  assert.match(hero, /\/assets\/hero-bg-scrub-720\.mp4/);
+  assert.doesNotMatch(hero, /requestIdleCallback/);
   assert.match(css, /\.hero__content\s*\{[\s\S]*?pointer-events:\s*auto/);
   assert.match(
     css.slice(css.indexOf("@media (max-width: 760px)")),

@@ -56,7 +56,7 @@ test("hero uses the supplied video and poster assets", async () => {
     "utf8",
   );
 
-  assert.match(hero, /\/assets\/hero-bg-optimized\.mp4/);
+  assert.match(hero, /\/assets\/hero-bg-scrub-720\.mp4/);
   assert.match(hero, /\/assets\/hero-first-frame\.webp/);
   assert.match(hero, /\/assets\/hero-poster\.webp/);
   assert.match(hero, /className=\{`hero hero--\$\{heroState\}\$\{/);
