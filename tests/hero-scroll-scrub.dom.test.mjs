@@ -624,7 +624,7 @@ test("enabling reduced motion after mount releases one-way and removes its liste
   }
 });
 
-test("mounted Hero content is immediately readable while media remains progressive", async () => {
+test("mounted Hero content waits for the cinematic sequence and media failure releases it", async () => {
   const environment = installDom({
     mediaMatches: { "(pointer: coarse)": true },
     styles: heroStyles,
@@ -652,7 +652,11 @@ test("mounted Hero content is immediately readable while media remains progressi
     );
     assert.equal(content.hasAttribute("inert"), false);
     assert.equal(content.hasAttribute("aria-hidden"), false);
-    assert.equal(getComputedStyle(content).pointerEvents, "auto");
+    assert.equal(getComputedStyle(content).pointerEvents, "none");
+    assert.equal(
+      getComputedStyle(document.querySelector(".hero__content h1")).visibility,
+      "hidden",
+    );
 
     await act(async () => {
       document
@@ -663,7 +667,10 @@ test("mounted Hero content is immediately readable while media remains progressi
     assert.ok(document.querySelector(".hero--released"));
     assert.equal(content.hasAttribute("inert"), false);
     assert.equal(content.hasAttribute("aria-hidden"), false);
-    assert.equal(getComputedStyle(content).pointerEvents, "auto");
+    assert.equal(
+      getComputedStyle(document.querySelector(".hero__content h1")).visibility,
+      "visible",
+    );
   } finally {
     await act(async () => root.unmount());
     environment.restore();

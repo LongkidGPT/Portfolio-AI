@@ -30,6 +30,9 @@ export function HeroSection() {
     () => setTypewriterComplete(true),
     [],
   );
+  const contentRevealStarted = ["revealed", "released"].includes(
+    heroState,
+  );
 
   useEffect(() => {
     if (heroState !== "resolving") return undefined;
@@ -113,7 +116,7 @@ export function HeroSection() {
 
       <div className="hero__content">
         <HeroTypewriter
-          active
+          active={contentRevealStarted}
           onComplete={completeTypewriter}
         />
         <p>{heroSubtitle}</p>

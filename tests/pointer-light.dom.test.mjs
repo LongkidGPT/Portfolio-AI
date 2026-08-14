@@ -137,8 +137,8 @@ test("pointer light follows viewport coordinates outside Hero", async () => {
   }
 });
 
-test("pointer light is available with the immediately visible Hero title and settles at eighty percent opacity", async () => {
-  const environment = installDom({ heroState: "ready" });
+test("pointer light becomes available with the revealed Hero title and settles at eighty percent opacity", async () => {
+  const environment = installDom({ heroState: "revealed" });
   const { root } = await renderLight();
 
   try {
@@ -154,6 +154,17 @@ test("pointer light is available with the immediately visible Hero title and set
         Number(light.style.getPropertyValue("--pointer-opacity")) - 0.8,
       ) < 0.001,
     );
+  } finally {
+    await cleanup(root, environment);
+  }
+});
+
+test("pointer light stays unavailable while the Hero video is still scrubbing", async () => {
+  const environment = installDom({ heroState: "scrubbing" });
+  const { root } = await renderLight();
+
+  try {
+    assert.equal(document.querySelector(".pointer-light"), null);
   } finally {
     await cleanup(root, environment);
   }

@@ -297,19 +297,43 @@ a:focus-visible {
   width: min(90vw, 880px);
   transform: translateX(-50%);
   text-align: center;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .hero__content h1,
 .hero__content > p,
 .hero__actions > * {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.hero--revealed .hero__content h1,
+.hero--released .hero__content h1 {
+  visibility: visible;
   opacity: 1;
   transform: translateY(0);
 }
 
-.hero__content > p,
-.hero__actions {
-  animation: hero-information-in 700ms 120ms both cubic-bezier(0.2, 0.72, 0.2, 1);
+.hero--type-complete .hero__content {
+  pointer-events: auto;
+}
+
+.hero--type-complete .hero__content > p,
+.hero--type-complete .hero__actions > * {
+  visibility: visible;
+}
+
+.hero--type-complete .hero__content > p {
+  animation: hero-subtitle-in 650ms both cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+
+.hero--type-complete .hero__actions .button {
+  animation: hero-primary-in 650ms 160ms both cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+
+.hero--type-complete .hero__actions .wechat-pill {
+  animation: hero-wechat-in 650ms 320ms both cubic-bezier(0.2, 0.72, 0.2, 1);
 }
 
 .hero__content h1 {
@@ -1618,13 +1642,6 @@ a:focus-visible {
 @keyframes hero-cursor-blink {
   50% {
     opacity: 0;
-  }
-}
-
-@keyframes hero-information-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
   }
 }
 

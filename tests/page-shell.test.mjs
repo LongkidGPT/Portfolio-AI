@@ -412,6 +412,8 @@ test("Hero CSS layers the settled spatial view and reveals content in order", as
   assert.match(css, /\.hero__cycle-scene\s*\{[\s\S]*?opacity:\s*0/);
   assert.match(css, /\.hero--revealed \.hero__cycle-scene/);
   assert.match(css, /\.hero-typewriter__cursor/);
+  assert.match(css, /\.hero--revealed \.hero__content h1/);
+  assert.match(css, /\.hero--type-complete \.hero__content > p/);
   assert.match(css, /@keyframes hero-cursor-blink/);
   assert.match(css, /@keyframes hero-subtitle-in/);
   assert.match(css, /@keyframes hero-primary-in/);

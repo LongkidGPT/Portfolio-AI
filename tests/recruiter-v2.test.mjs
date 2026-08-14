@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("V2 exposes Hero information and navigation before the cinematic sequence completes", async () => {
+test("V2 reveals Hero information after the cinematic sequence completes", async () => {
   const [hero, css] = await Promise.all([
     read("src/HeroSection.jsx"),
     read("src/styles.css"),
@@ -12,11 +12,12 @@ test("V2 exposes Hero information and navigation before the cinematic sequence c
 
   assert.doesNotMatch(hero, /contentIsHidden/);
   assert.doesNotMatch(hero, /event\.preventDefault\(\)/);
-  assert.match(hero, /<HeroTypewriter\s+active/);
+  assert.match(hero, /active=\{contentRevealStarted\}/);
   assert.match(hero, /preload="auto"/);
   assert.match(hero, /\/assets\/hero-bg-scrub-720\.mp4/);
   assert.doesNotMatch(hero, /requestIdleCallback/);
-  assert.match(css, /\.hero__content\s*\{[\s\S]*?pointer-events:\s*auto/);
+  assert.match(css, /\.hero__content\s*\{[\s\S]*?pointer-events:\s*none/);
+  assert.match(css, /\.hero--type-complete \.hero__content\s*\{[\s\S]*?pointer-events:\s*auto/);
   assert.match(
     css.slice(css.indexOf("@media (max-width: 760px)")),
     /\.top-nav__links\s*\{[\s\S]*?display:\s*flex/,

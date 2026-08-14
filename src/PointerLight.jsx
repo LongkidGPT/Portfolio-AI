@@ -9,7 +9,7 @@ const INITIAL_LIGHT = {
   opacity: 0,
 };
 const LIGHT_SETTLE_EPSILON = 0.001;
-const ACTIVE_HERO_STATES = ".hero";
+const ACTIVE_HERO_STATES = ".hero--revealed, .hero--released";
 
 function ActivePointerLight() {
   const lightRef = useRef(null);
