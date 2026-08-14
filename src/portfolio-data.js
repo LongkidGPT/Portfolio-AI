@@ -104,7 +104,7 @@ export const experience = [
   {
     company: "林氏家居 Linsy",
     role: "设计主管（带 8 人团队）",
-    period: "2021.06 – 2023.09",
+    period: "2021.06 – 2023.08",
   },
   {
     company: "熠思霆创意 Extend",
