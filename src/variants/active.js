@@ -3,9 +3,11 @@
 //   某岗构建：    VITE_VARIANT=<岗> npm run build
 // 新增一个岗 = 在本目录加一个 <岗>.js，并在下面 import + variants 里各登记一行。
 import * as defaultVariant from "./default.js";
+import * as tplink from "./tplink.js";
 
 const variants = {
   default: defaultVariant,
+  tplink: tplink,
 };
 
 const requested = import.meta.env?.VITE_VARIANT || "default";
