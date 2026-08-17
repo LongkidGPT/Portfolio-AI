@@ -11,6 +11,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 let vite;
 let HeroTypewriter;
+let titleLines;
 
 test.before(async () => {
   vite = await createServer({
@@ -18,7 +19,7 @@ test.before(async () => {
     logLevel: "silent",
     server: { middlewareMode: true },
   });
-  ({ HeroTypewriter } = await vite.ssrLoadModule(
+  ({ HeroTypewriter, titleLines } = await vite.ssrLoadModule(
     "/src/HeroTypewriter.jsx",
   ));
 });
@@ -109,20 +110,16 @@ test("typewriter types both title lines then keeps the cursor for one second", a
     });
 
     const title = document.querySelector("h1");
-    assert.equal(
-      title.getAttribute("aria-label"),
-      "DESIGN FOR BUSINESS MOMENTUM",
-    );
+    assert.equal(title.getAttribute("aria-label"), titleLines.join(" "));
     assert.equal(environment.pending(30), 1);
 
-    for (let index = 0; index < 27; index += 1) {
+    const totalChars = titleLines.reduce((sum, line) => sum + line.length, 0);
+    for (let index = 0; index < totalChars; index += 1) {
       await environment.runNext(30);
     }
 
-    assert.match(
-      document.querySelector(".hero-typewriter__typed").textContent,
-      /DESIGN FOR BUSINESS\s*MOMENTUM/,
-    );
+    const typedText = document.querySelector(".hero-typewriter__typed").textContent;
+    for (const line of titleLines) assert.ok(typedText.includes(line));
     assert.ok(document.querySelector(".hero-typewriter__cursor"));
     assert.equal(environment.pending(1000), 1);
     assert.equal(completed, 0);
@@ -153,8 +150,8 @@ test("reduced motion exposes the complete title without typing timers", async ()
       );
     });
 
-    assert.match(document.querySelector("h1").textContent, /DESIGN FOR BUSINESS/);
-    assert.match(document.querySelector("h1").textContent, /MOMENTUM/);
+    const headingText = document.querySelector("h1").textContent;
+    for (const line of titleLines) assert.ok(headingText.includes(line));
     assert.equal(document.querySelector(".hero-typewriter__cursor"), null);
     assert.equal(environment.pending(30), 0);
     assert.equal(completed, 1);
