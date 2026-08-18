@@ -14,11 +14,9 @@ export const heroSubtitle =
 
 export const footerTagline = "Art Direction · Retail Visual · AIGC";
 
-// system（品牌包装规范 / 货架陈列）打头当宽卡 banner：
-//   ① 对上 JD 第 3、4 条（零售推广物料、体验店运营设计）
-//   ② 它的封面是真实的 Anker/soundcore/eufy 零售陈列图，是 AI 版最硬的画面证据
-export const projectOrder = ["system", "marketing", "brand"];
-export const featured = "system";
+// 卡片组合、顺序与宽卡位置严格沿用母版；零售关联通过文案呈现。
+export const projectOrder = ["brand", "marketing", "system"];
+export const featured = "brand";
 
 export const approachIntro =
   "从终端场景与货架体验出发，到定义主视觉、铺开触点、带队交付";
@@ -37,19 +35,37 @@ export const principleDescriptions = [
 
 // 沿用母版真实内容与数据，不改
 export const projectContent = {
-  system: {
-    title: "系统架构｜品牌包装规范",
-    description:
-      "构建可复用包装规范体系，品牌视觉识别度提升32%，新SKU接入效率提升40%",
-  },
-  marketing: {
-    title: "营销全案｜新品上市视觉",
-    description:
-      "面向北美市场的DTC落地页设计与数据驱动优化，Pre-Order点击率提升2.6倍",
-  },
   brand: {
     title: "品牌系统｜视觉语言定义",
     description:
-      "负责视觉系统中的光影、影像与场景规则模块，将既有品牌战略转化为跨品牌、跨团队的可执行应用方法，并参与全球市场落地",
+      "定义品牌视觉语言与终端场景规则，\n支撑零售触点一致体验",
+  },
+  marketing: {
+    title: "新品上市｜主视觉与页面优化",
+    description:
+      "新品主视觉与页面表达优化，\nPre-Order 点击率提升 2.6 倍",
+  },
+  system: {
+    title: "包装系统｜零售规范与陈列",
+    description:
+      "包装规范与货架陈列系统，\n识别度 +32%，SKU 接入效率 +40%",
+  },
+};
+
+export const caseStudySummary = {
+  brand: {
+    background: "新品与门店多触点传播，需要统一品牌感知与终端视觉表达。",
+    responsibility: "定义光影、影像与场景规则，并统筹跨团队视觉落地。",
+    outcome: "形成可复用视觉系统，支持多触点一致表达与高效交付。",
+  },
+  marketing: {
+    background: "新品上市与大促传播，需要让主视觉在页面与零售触点连续表达。",
+    responsibility: "负责上市视觉、主视觉延展与页面信息表达的统一优化。",
+    outcome: "Pre-Order 点击率提升 2.6 倍，验证关键页面的转化优化。",
+  },
+  system: {
+    background: "多 SKU 与零售终端扩展，需要兼顾包装识别、货架呈现与上新效率。",
+    responsibility: "构建包装规范、设计模板与跨团队执行规则，支撑多批次落地。",
+    outcome: "品牌识别度提升 32%，新 SKU 接入效率提升 40%。",
   },
 };

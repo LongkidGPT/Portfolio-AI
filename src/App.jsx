@@ -1,6 +1,13 @@
 import { useCallback } from "react";
 
-import { experience, principles, projects } from "./portfolio-data.js";
+<<<<<<< HEAD
+import {
+  approachIntro,
+  experience,
+  principles,
+  projects,
+  workIntro,
+} from "./portfolio-data.js";
 import { ContactSection } from "./ContactSection.jsx";
 import { ExperienceSection } from "./ExperienceSection.jsx";
 import { HeroSection } from "./HeroSection.jsx";
@@ -39,7 +46,7 @@ export function App() {
               <SectionLabel number="01">SELECTED WORK</SectionLabel>
               <header className="section-heading">
                 <h2>PROOF THROUGH PROJECTS</h2>
-                <p>以三个代表项目，呈现从业务拆解到全渠道落地的架构与闭环能力</p>
+                <p>{workIntro}</p>
               </header>
               <div className="project-grid">
                 {projects.map((project) => (
@@ -68,7 +75,7 @@ export function App() {
                     <br />
                     DESIGN FORWARD
                   </h2>
-                  <p>从判断问题开始，到定义方向、推动交付、沉淀方法</p>
+                  <p>{approachIntro}</p>
                 </header>
 
                 <ol className="principles">
