@@ -1,10 +1,17 @@
 import { caseStudyContent } from "./case-study-content.js";
+import { activeVariant } from "./variants/active.js";
 
 export function getCaseStudy(manifest, caseId) {
   if (!caseId || !manifest[caseId]) return null;
+  const content = caseStudyContent[caseId];
+  const summaryOverride = activeVariant.caseStudySummary?.[caseId];
   return {
     ...manifest[caseId],
-    ...caseStudyContent[caseId],
+    ...content,
+    summary: {
+      ...content.summary,
+      ...summaryOverride,
+    },
   };
 }
 

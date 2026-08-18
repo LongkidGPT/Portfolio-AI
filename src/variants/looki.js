@@ -7,13 +7,13 @@
 // 真实图片、数据、履历、案例证据沿用母版，不虚构。
 
 export const heroSubtitle =
-  "从店铺形象到详情与大促页，国内外电商都做过，用点击和转化验证";
+  "详情页、大促会场与新品上市页，用页面结构与视觉表达推动点击和转化";
 
-export const footerTagline = "E-commerce Visual · AIGC";
+export const footerTagline = "E-commerce Visual · Product Launch · Conversion Design";
 
-// 电商打头（JD 第 1、2 条）；品牌一致性（JD 第 3 条）第二
-export const projectOrder = ["marketing", "brand", "system"];
-export const featured = "marketing";
+// 卡片组合、顺序与宽卡位置严格沿用母版；仅调整各卡文案。
+export const projectOrder = ["brand", "marketing", "system"];
+export const featured = "brand";
 
 export const approachIntro =
   "从用户决策路径出发，到页面结构、视觉表达、数据复盘";
@@ -33,18 +33,37 @@ export const principleDescriptions = [
 // 沿用母版真实内容与数据，不改
 export const projectContent = {
   marketing: {
-    title: "营销全案｜新品上市视觉",
+    title: "新品上市｜DTC转化优化",
     description:
-      "面向北美市场的DTC落地页设计与数据驱动优化，Pre-Order点击率提升2.6倍",
+      "DTC 新品页面优化，\nPre-Order 点击率提升 2.6 倍",
   },
   brand: {
     title: "品牌系统｜视觉语言定义",
     description:
-      "负责视觉系统中的光影、影像与场景规则模块，将既有品牌战略转化为跨品牌、跨团队的可执行应用方法，并参与全球市场落地",
+      "定义光影、影像与场景规则，\n推动品牌策略在全球市场落地",
   },
   system: {
     title: "系统架构｜品牌包装规范",
     description:
-      "构建可复用包装规范体系，品牌视觉识别度提升32%，新SKU接入效率提升40%",
+      "包装规范体系化，识别度 +32%，\nSKU 接入效率 +40%",
+  },
+};
+
+// 子页只覆盖母版现有的三栏概览，不改变结构或字段顺序。
+export const caseStudySummary = {
+  brand: {
+    background: "海外市场与多触点扩张，需要统一且易识别的品牌视觉表达。",
+    responsibility: "定义光影、影像与场景规则，并沉淀为可复用的设计规范。",
+    outcome: "形成可复用视觉系统，支持跨市场一致表达与高效落地。",
+  },
+  marketing: {
+    background: "北美新品上市，需要在 DTC 页面清晰建立卖点认知与购买信心。",
+    responsibility: "负责上市视觉、信息层级与购买路径优化，并以数据验证转化。",
+    outcome: "Pre-Order 点击率提升 2.6 倍，强化页面转化效率。",
+  },
+  system: {
+    background: "多 SKU 扩张，需要兼顾包装识别一致性与快速上新的接入效率。",
+    responsibility: "构建包装规范、设计模板与跨团队执行规则，提升接入效率。",
+    outcome: "品牌识别度提升 32%，新 SKU 接入效率提升 40%。",
   },
 };
