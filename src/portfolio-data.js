@@ -1,6 +1,6 @@
 import { activeVariant } from "./variants/active.js";
 
-export const principles = [
+const basePrinciples = [
   {
     number: "01",
     title: "理解业务",
@@ -27,6 +27,12 @@ export const principles = [
     description: "总结项目经验，沉淀设计模板、资产库与可复用的规范规则",
   },
 ];
+
+export const principles = basePrinciples.map((principle, index) => ({
+  ...principle,
+  description:
+    activeVariant.principleDescriptions?.[index] ?? principle.description,
+}));
 
 export function resolveProjectArtwork(
   project,
@@ -94,6 +100,12 @@ export const projects = activeVariant.projectOrder.map((id) => {
 // 变体控制的文案（供 HeroSection / ContactSection 使用）
 export const heroSubtitle = activeVariant.heroSubtitle;
 export const footerTagline = activeVariant.footerTagline;
+export const approachIntro =
+  activeVariant.approachIntro ??
+  "从判断问题开始，到定义方向、推动交付、沉淀方法";
+export const workIntro =
+  activeVariant.workIntro ??
+  "以三个代表项目，呈现从业务拆解到全渠道落地的架构与闭环能力";
 
 export const experience = [
   {

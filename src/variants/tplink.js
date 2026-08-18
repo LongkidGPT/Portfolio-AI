@@ -35,16 +35,34 @@ export const projectContent = {
   brand: {
     title: "品牌系统｜视觉语言定义",
     description:
-      "负责视觉系统中的光影、影像与场景规则模块，将既有品牌战略转化为跨品牌、跨团队的可执行应用方法，并参与全球市场落地",
+      "定义品牌视觉语言与场景规则，\n支撑跨团队与跨市场一致落地",
   },
   marketing: {
     title: "营销全案｜新品上市视觉",
     description:
-      "面向北美市场的DTC落地页设计与数据驱动优化，Pre-Order点击率提升2.6倍",
+      "新品上市视觉与 DTC 页面优化，\nPre-Order 点击率提升 2.6 倍",
   },
   system: {
     title: "系统架构｜品牌包装规范",
     description:
-      "构建可复用包装规范体系，品牌视觉识别度提升32%，新SKU接入效率提升40%",
+      "构建包装规范与设计模板，\n识别度 +32%，SKU 接入效率 +40%",
+  },
+};
+
+export const caseStudySummary = {
+  brand: {
+    background: "品牌向多品类与生活方式场景延展，需要统一清晰的视觉语言。",
+    responsibility: "定义光影、影像与场景规则，转化为可执行的品牌视觉规范。",
+    outcome: "形成可复用视觉系统，支持网页专题、产品 KV 与跨市场落地。",
+  },
+  marketing: {
+    background: "新品上市需在网页专题与 DTC 页面同步传达卖点，建立购买信心。",
+    responsibility: "负责上市视觉、落地页信息表达与关键页面体验优化。",
+    outcome: "Pre-Order 点击率提升 2.6 倍，验证页面信息与转化路径优化。",
+  },
+  system: {
+    background: "多品类与多 SKU 扩张，需要兼顾识别一致性与快速接入。",
+    responsibility: "构建包装规范、设计模板与跨团队执行规则。",
+    outcome: "品牌识别度提升 32%，新 SKU 接入效率提升 40%。",
   },
 };
