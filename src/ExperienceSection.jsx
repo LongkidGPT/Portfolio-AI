@@ -15,9 +15,7 @@ export function ExperienceSection({ items }) {
         <div className="experience__layout">
           <header className="experience__intro">
             <h2>
-              ACROSS BRAND,
-              <br />
-              PRODUCT AND MARKET
+              BRAND-TO-MARKET
             </h2>
             <h3>Kid（龙昊翔） · 人类 · 资深视觉设计师</h3>
             <p>10+ 年消费科技、品牌视觉、上市传播与多触点设计经验。</p>

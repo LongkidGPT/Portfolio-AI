@@ -41,8 +41,7 @@ test("Experience section exposes the editorial career structure", async () => {
   assert.match(experienceSection, /className="experience__intro"/);
   assert.match(experienceSection, /className="experience-list"/);
   assert.match(experienceSection, /className="experience-row"/);
-  assert.match(experienceSection, /ACROSS BRAND,/);
-  assert.match(experienceSection, /PRODUCT AND MARKET/);
+  assert.match(experienceSection, /BRAND-TO-MARKET/);
   assert.match(experienceSection, /data-track-label="EXPERIENCE"/);
   assert.doesNotMatch(
     css,
@@ -375,17 +374,21 @@ test("zoom-stable CSS keeps tablet card copy and modal content in bounds", async
   assert.match(cssDeclarations(tablet, ".project-card__arrow"), /width:\s*clamp\(/);
 });
 
-test("case-study modal renders the required accessible document shell", async () => {
-  const [app, modal, css] = await Promise.all([
+test("case-study document supports shareable routes while retaining its accessible shell", async () => {
+  const [app, main, modal, page, css] = await Promise.all([
     readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/main.jsx", import.meta.url), "utf8"),
     readFile(new URL("../src/CaseStudyModal.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/CaseStudyPage.jsx", import.meta.url), "utf8"),
     readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
   ]);
 
-  assert.match(app, /selectedCaseId/);
-  assert.match(app, /<CaseStudyModal/);
+  assert.match(app, /window\.location\.assign\(`\/case\/\$\{caseId\}`\)/);
+  assert.match(main, /brand\|marketing\|system/);
+  assert.match(page, /standalone/);
   assert.match(modal, /loading="lazy"/);
-  assert.match(modal, /aria-modal="true"/);
+  assert.match(modal, /aria-modal=\{standalone \? undefined : "true"\}/);
+  assert.match(modal, /case-study--page/);
   assert.match(modal, /case-study__retry/);
   assert.match(
     css,
@@ -549,7 +552,7 @@ test("support copy and Hero cursor use the revised visual hierarchy", async () =
   );
   assert.match(
     cssDeclarations(desktop, ".project-card__copy > span"),
-    /color:\s*rgba\(232,\s*239,\s*239,\s*0\.55\)/,
+    /color:\s*rgba\(235,\s*242,\s*242,\s*0\.66\)[\s\S]*font-weight:\s*400/,
   );
   assert.match(
     cssDeclarations(desktop, ".hero__content > p"),
@@ -561,7 +564,7 @@ test("support copy and Hero cursor use the revised visual hierarchy", async () =
   );
   assert.match(
     cssDeclarations(desktop, ".experience-row span:nth-child(2)"),
-    /color:\s*rgba\(229,\s*235,\s*235,\s*0\.55\)/,
+    /color:\s*rgba\(235,\s*241,\s*241,\s*0\.66\)[\s\S]*font-weight:\s*400/,
   );
   assert.match(
     cssDeclarations(desktop, ".hero-typewriter__cursor"),

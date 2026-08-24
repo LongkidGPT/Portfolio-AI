@@ -50,6 +50,15 @@ test("homepage media derivatives exist within delivery budgets", async () => {
   );
 });
 
+test("document preloads the Hero fallback frame before the app module runs", async () => {
+  const html = await readFile(repoFile("/index.html"), "utf8");
+
+  assert.match(
+    html,
+    /<link\s+rel="preload"\s+as="image"\s+href="\/assets\/hero-first-frame\.webp"[\s\S]*?fetchpriority="high"/,
+  );
+});
+
 test("pointer light derivative stays below its critical-load budget", async () => {
   const { size } = await stat(
     repoFile("/public/assets/pointer-light-02.webp"),

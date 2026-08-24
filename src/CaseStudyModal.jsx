@@ -21,6 +21,7 @@ export function CaseStudyModal({
   previousProject,
   nextProject,
   onSelectCase,
+  standalone = false,
 }) {
   const caseStudy = getCaseStudy(caseStudies, caseId);
   const accessibility = getCaseStudyAccessibility(title);
@@ -34,15 +35,19 @@ export function CaseStudyModal({
 
   useEffect(() => {
     setSliceStates({});
-    modalRef.current?.scrollTo?.({ top: 0 });
+    if (standalone) {
+      window.scrollTo?.({ top: 0 });
+    } else {
+      modalRef.current?.scrollTo?.({ top: 0 });
+    }
     caseViewIdRef.current = caseId
       ? (globalThis.crypto?.randomUUID?.() ?? `${caseId}-${Date.now()}`)
       : null;
-  }, [caseId]);
+  }, [caseId, standalone]);
 
   useEffect(() => {
-    if (!caseStudy || !modalRef.current) return undefined;
-    const scroller = modalRef.current;
+    if (!caseStudy || (!standalone && !modalRef.current)) return undefined;
+    const scroller = standalone ? window : modalRef.current;
     const analytics = getPortfolioAnalytics();
     const dwell = Array.from({ length: 12 }, () => 0);
     let lastSampleAt = performance.now();
@@ -54,11 +59,16 @@ export function CaseStudyModal({
       const elapsed = document.visibilityState === "hidden" ? 0 : now - lastSampleAt;
       lastSampleAt = now;
       activeDwellMs += elapsed;
-      const scrollable = Math.max(scroller.scrollHeight - scroller.clientHeight, 1);
-      const depth = Math.min(100, Math.round((scroller.scrollTop / scrollable) * 100));
+      const scrollHeight = standalone
+        ? document.documentElement.scrollHeight
+        : scroller.scrollHeight;
+      const clientHeight = standalone ? window.innerHeight : scroller.clientHeight;
+      const scrollTop = standalone ? window.scrollY : scroller.scrollTop;
+      const scrollable = Math.max(scrollHeight - clientHeight, 1);
+      const depth = Math.min(100, Math.round((scrollTop / scrollable) * 100));
       maxDepth = Math.max(maxDepth, depth);
-      const center = scroller.scrollTop + scroller.clientHeight / 2;
-      const segment = Math.min(11, Math.max(0, Math.floor((center / Math.max(scroller.scrollHeight, 1)) * 12)));
+      const center = scrollTop + clientHeight / 2;
+      const segment = Math.min(11, Math.max(0, Math.floor((center / Math.max(scrollHeight, 1)) * 12)));
       dwell[segment] += elapsed;
     };
     const report = () => {
@@ -84,10 +94,10 @@ export function CaseStudyModal({
       document.removeEventListener("visibilitychange", onVisibility);
       window.clearInterval(heartbeat);
     };
-  }, [caseStudy, title]);
+  }, [caseStudy, standalone, title]);
 
   useEffect(() => {
-    if (!caseStudy) return undefined;
+    if (!caseStudy || standalone) return undefined;
 
     const handleKeyDown = (event) => {
       handleCaseStudyKeyDown({
@@ -109,7 +119,7 @@ export function CaseStudyModal({
       document.removeEventListener("keydown", handleKeyDown);
       restoreEnvironment();
     };
-  }, [backgroundRef, caseStudy, onClose, returnFocusRef]);
+  }, [backgroundRef, caseStudy, onClose, returnFocusRef, standalone]);
 
   if (!caseStudy) return null;
 
@@ -134,23 +144,29 @@ export function CaseStudyModal({
   return (
     <div
       ref={modalRef}
-      className="case-study"
-      role="dialog"
-      aria-modal="true"
+      className={`case-study${standalone ? " case-study--page" : ""}`}
+      role={standalone ? undefined : "dialog"}
+      aria-modal={standalone ? undefined : "true"}
       aria-labelledby={accessibility.titleId}
       aria-describedby={summaryId}
-      onClick={handleBackdropClick}
+      onClick={standalone ? undefined : handleBackdropClick}
     >
       <div className="case-study__document">
-        <button
-          ref={closeButtonRef}
-          className="case-study__close"
-          type="button"
-          onClick={onClose}
-          aria-label="关闭案例"
-        >
-          关闭 ×
-        </button>
+        {standalone ? (
+          <a className="case-study__close" href="/#work">
+            返回作品概览
+          </a>
+        ) : (
+          <button
+            ref={closeButtonRef}
+            className="case-study__close"
+            type="button"
+            onClick={onClose}
+            aria-label="关闭案例"
+          >
+            关闭 ×
+          </button>
+        )}
         <header className="case-study__overview" ref={summaryRef}>
           <p className="case-study__eyebrow">PROJECT OVERVIEW</p>
           <h2

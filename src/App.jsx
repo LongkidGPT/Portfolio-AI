@@ -1,7 +1,6 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback } from "react";
 
 import { experience, principles, projects } from "./portfolio-data.js";
-import { CaseStudyModal } from "./CaseStudyModal.jsx";
 import { ContactSection } from "./ContactSection.jsx";
 import { ExperienceSection } from "./ExperienceSection.jsx";
 import { HeroSection } from "./HeroSection.jsx";
@@ -19,34 +18,41 @@ function SectionLabel({ number, children }) {
 }
 
 export function App() {
-  const backgroundRef = useRef(null);
-  const returnFocusRef = useRef(null);
-  const [selectedCaseId, setSelectedCaseId] = useState(null);
-  const selectedProject = projects.find(
-    (project) => project.id === selectedCaseId,
-  );
-  const selectedProjectIndex = projects.findIndex(
-    (project) => project.id === selectedCaseId,
-  );
-  const previousProject =
-    selectedProjectIndex > 0 ? projects[selectedProjectIndex - 1] : null;
-  const nextProject =
-    selectedProjectIndex >= 0 && selectedProjectIndex < projects.length - 1
-      ? projects[selectedProjectIndex + 1]
-      : null;
   const handleOpenCase = useCallback((caseId) => {
-    returnFocusRef.current = document.activeElement;
-    setSelectedCaseId(caseId);
+    window.location.assign(`/case/${caseId}`);
   }, []);
-  const handleCloseCase = useCallback(() => setSelectedCaseId(null), []);
 
   return (
     <>
       <PointerLight />
-      <div ref={backgroundRef}>
+      <div>
         <HeroSection />
 
         <main className="content-layer">
+          <section
+            className="section work"
+            id="work"
+            data-track-section
+            data-track-label="SELECTED WORK"
+          >
+            <div className="shell">
+              <SectionLabel number="01">SELECTED WORK</SectionLabel>
+              <header className="section-heading">
+                <h2>PROOF THROUGH PROJECTS</h2>
+                <p>以三个代表项目，呈现从业务拆解到全渠道落地的架构与闭环能力</p>
+              </header>
+              <div className="project-grid">
+                {projects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onOpenCase={handleOpenCase}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+
           <section
             className="section approach"
             id="approach"
@@ -54,7 +60,7 @@ export function App() {
             data-track-label="APPROACH"
           >
             <div className="shell">
-              <SectionLabel number="01">APPROACH</SectionLabel>
+              <SectionLabel number="02">APPROACH</SectionLabel>
               <div className="approach__layout">
                 <header className="approach__intro">
                   <h2>
@@ -80,46 +86,12 @@ export function App() {
             </div>
           </section>
 
-          <section
-            className="section work"
-            id="work"
-            data-track-section
-            data-track-label="SELECTED WORK"
-          >
-            <div className="shell">
-              <SectionLabel number="02">SELECTED WORK</SectionLabel>
-              <header className="section-heading">
-                <h2>PROOF THROUGH PROJECTS</h2>
-                <p>以三个代表项目，呈现从业务拆解到全渠道落地的架构与闭环能力</p>
-              </header>
-              <div className="project-grid">
-                {projects.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    onOpenCase={handleOpenCase}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
-
           <ExperienceSection items={experience} />
 
           <ContactSection />
         </main>
         <VisitorMonitor />
       </div>
-      <CaseStudyModal
-        caseId={selectedCaseId}
-        title={selectedProject?.title ?? ""}
-        onClose={handleCloseCase}
-        backgroundRef={backgroundRef}
-        returnFocusRef={returnFocusRef}
-        previousProject={previousProject}
-        nextProject={nextProject}
-        onSelectCase={setSelectedCaseId}
-      />
     </>
   );
 }
