@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 
-<<<<<<< HEAD
 import {
   approachIntro,
   experience,
